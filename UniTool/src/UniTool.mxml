@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TabbedViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx"
+							xmlns:s="library://ns.adobe.com/flex/spark"
+							applicationDPI="160" creationComplete="tabbedviewnavigatorapplication1_creationCompleteHandler(event)" >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			protected function tabbedviewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				var _user:User = new User();
+				if(_user.status()){
+					//vskAll.selectedChild=cvsViste;
+				}else{
+					//vskAll.selectedChild=cvsMenu;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Style source="SunNight.css" />
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<s:ViewNavigator id="viewPiano" label="Piano di studi" width="100%" height="100%" firstView="views.Piano" />
+	<s:ViewNavigator id="viewEsami" label="Esami sostenuti" width="100%" height="100%" firstView="views.Lista" />
+	<s:ViewNavigator id="viewAgenda" label="Agenda" width="100%" height="100%" firstView="views.Agenda" />
+	<s:ViewNavigator id="viewStat" label="Statistiche" width="100%" height="100%" firstView="views.Stat" />
+	
+</s:TabbedViewNavigatorApplication>

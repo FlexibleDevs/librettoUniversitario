@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" title="{strTitle}"
+		xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="Esami_creationComplete(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.formatters.DateFormatter;
+			import mx.managers.CursorManager;
+			
+			[Bindable]
+			private var dttApp:DateFormatter = new DateFormatter();
+			[Bindable]
+			private var dttApp02:DateFormatter = new DateFormatter();
+			
+			[Bindable]
+			private var _esami:Esami = new Esami();
+			[Bindable]
+			private var _user:User = new User();
+			
+			[Bindable]
+			private var strTitle:String;
+			
+			[Bindable]
+			private var arcEsami:Array;
+			[Bindable]
+			private var arcVoti:Array;
+			
+			private function Esami_creationComplete(e:Event):void{
+				AggiornaVoti();
+				AggiornaEsami();
+				
+				strTitle=_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+				
+				dttApp.formatString='DD/MM/YYYY';
+				dttApp02.formatString='YYYY-MM-DD';
+			}
+			
+			public function del_click(obj:Object):void{
+				Alert.show("Sicuro di voler eliminare l'esame di " + obj.voe_desc + " ?", "Manager", Alert.YES | Alert.NO, this, CancellaEsame, null, Alert.YES);
+			}
+			
+			private function CancellaEsame(e:CloseEvent):void{
+				if(e.detail == Alert.YES){
+					if(_esami.callquery("delete tabella_votiesami from tabella_votiesami where voe_codi = "+grdEsami.selectedItem.voe_codi,null)){
+						AggiornaEsami();
+						btnNuovo_click(null);
+					}else{
+						Alert.show("Impossibile eliminare l'esame !");
+					}
+				}
+			}
+			
+			private function btnNuovo_click(e:Event):void{
+				txtVoe_codi.text=null;
+				txtVoe_desc.text=null;
+				txtVoe_cred.text=null;
+				txtVoe_data.text='';
+				txtVoe_desc.setFocus();	
+			}
+			
+			private function btnSalva_click(e:Event):void{
+				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.text != null && txtVoe_data.text != ''){
+					CursorManager.setBusyCursor();
+					if(txtVoe_codi.text.length > 0){
+						if(_esami.callquery("update tabella_votiesami "+
+											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.text)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+chkMedia.selected+
+											 " where voe_codi = "+txtVoe_codi.text,null)){
+							AggiornaEsami();
+							btnNuovo_click(null);
+						}else{
+							Alert.show("Errore nell'aggiornamento dell'esame !");
+						}
+					}else{
+						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
+										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.text)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+chkMedia.selected+" from tabella_votiesami",null)){
+							AggiornaEsami();
+							btnNuovo_click(null);
+						}else{
+							Alert.show("Errore nell'inserimento dell'esame !");
+						}
+					}
+				}else{
+					Alert.show("Attenzione campi obbligatori mancanti !");
+				}
+			}
+			
+			private function grdEsami_doubleClick(e:Event):void{
+				txtVoe_codi.text=grdEsami.selectedItem.voe_codi;
+				txtVoe_desc.text=grdEsami.selectedItem.voe_desc;
+				txtVoe_cred.text=grdEsami.selectedItem.voe_cred;
+				txtVoe_data.text=grdEsami.selectedItem.voe_data;
+				var intval_codi:int=0;
+				for(var i:int=0;i<cmbVal_codi.dataProvider.length;i++){
+					if(cmbVal_codi.dataProvider[i].val_codi == grdEsami.selectedItem.val_codi){
+						intval_codi=i;
+						break;
+					}
+				}
+				cmbVal_codi.selectedIndex=intval_codi;
+			}
+			
+			private function AggiornaEsami():void{
+				arcEsami=_esami.getEsami(1);
+			}
+			
+			private function AggiornaVoti():void{
+				arcVoti=_esami.getValutazioni();
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<mx:NumberFormatter precision="2" id="formatter" />
+	</fx:Declarations>
+	<mx:Label x="11" y="66" text="Descrizione " width="112"/>
+	<mx:Label x="10" y="120" text="Voto esame" width="112"/>
+	<mx:Label x="243" y="122" text="Includi nella media" width="148"/>
+	<mx:Label x="10" y="12" width="112" height="48" text="Codice esame" textAlign="left"/>
+	<mx:Label x="244" y="10" width="98" height="50" text="Data esame"/>
+	<mx:Label x="10" y="178" text="Crediti esame" width="112"/>
+	<mx:HBox left="10" right="10" bottom="10" horizontalAlign="center">
+		<mx:Button label="Aggiorna" click="AggiornaEsami()"/>
+		<mx:Button label="Nuovo" id="btnNuovo" click="btnNuovo_click(event)"/>
+		<mx:Button label="Salva" id="btnSalva" click="btnSalva_click(event)"/>
+	</mx:HBox>
+	<mx:ComboBox id="cmbVal_codi" x="130" y="118" width="105" height="50" dataProvider="{arcVoti}"
+				 labelField="val_desc"/>
+	<mx:TextInput id="txtVoe_desc" y="64" left="131" right="9" height="50" fontSize="20"
+				  maxChars="100"/>
+	<mx:TextInput id="txtVoe_cred" x="130" y="176" width="105" height="50" restrict="0-9."/>
+	<mx:TextInput id="txtVoe_codi" x="130" y="10" width="106" height="50" disabledColor="#000000"
+				  editable="false" enabled="false"/>
+	<mx:DataGrid id="grdEsami" left="10" top="414" bottom="40" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true"
+				 doubleClick="grdEsami_doubleClick(event)" variableRowHeight="true" >
+		<mx:columns>
+			<mx:DataGridColumn headerText="ID" dataField="voe_codi" width="60"/>
+			<mx:DataGridColumn headerText="Descrizione" dataField="voe_desc" wordWrap="true"/>
+			<mx:DataGridColumn headerText="Data" dataField="voe_data" width="80"/>
+			<mx:DataGridColumn headerText="Valutazione" fontSize="13" dataField="val_desc" width="80"/>
+			<mx:DataGridColumn headerText="Crediti" dataField="voe_cred" width="80"/>
+			<mx:DataGridColumn width="30">
+				<mx:itemRenderer>
+					<fx:Component>
+						<mx:Image width="30" height="50" source="image/elimina.png" useHandCursor="true" mouseChildren="false" buttonMode="true"
+								  toolTip="Elimina Esame" click="outerDocument.del_click(data)" />
+					</fx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+	<mx:Label right="82" top="229" width="118" text="Totale Esami:"/>
+	<mx:Label text="{grdEsami.dataProvider.length}" fontWeight="bold" width="64" right="10" top="227"/>
+	<mx:Image right="100" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
+			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="199"/>
+	<mx:DateField id="txtVoe_data" x="350" y="10" width="150" height="50" formatString="DD/MM/YYYY"/>
+	<mx:CheckBox id="chkMedia" x="399" y="126"/>
+</s:View>
