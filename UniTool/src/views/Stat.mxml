@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:controls="com.brightPoint.controls.*" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
-		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:mx="library://ns.adobe.com/flex/mx" title="{strTitle}"
 		creationComplete="Stat_creationComplete(event)">
 	<fx:Script>
 		<![CDATA[
@@ -19,6 +19,11 @@
 			private var intUsr_codi:int;
 			
 			[Bindable]
+			private var strTitle:String;
+			[Bindable]
+			private var _user:User = new User();
+			
+			[Bindable]
 			private var dttApp:DateFormatter = new DateFormatter();
 			[Bindable]
 			private var dttApp02:DateFormatter = new DateFormatter();
@@ -29,6 +34,8 @@
 				
 				//prendo codice utente da file config
 				userRequest10.send();
+				
+				strTitle="Statistiche - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
 			}
 			
 			private function lch01_dataTipFunction(hd:HitData):String {
