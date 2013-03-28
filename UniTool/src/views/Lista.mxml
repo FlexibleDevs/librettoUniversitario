@@ -66,7 +66,6 @@
 			
 			private function btnSalva_click(e:Event):void{
 				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.selectedDate != null){
-					CursorManager.setBusyCursor();
 					if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
 											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+cmbMedia.selectedItem.data+
@@ -119,7 +118,7 @@
 	</fx:Declarations>
 	<mx:Label right="10" bottom="459" width="94" height="50" fontSize="25" fontWeight="bold"
 			  text="{grdEsami.dataProvider.length}" textAlign="center"/>
-	<mx:HBox left="10" right="10" bottom="10" horizontalAlign="center">
+	<mx:HBox left="10" right="10" bottom="10" height="40" horizontalAlign="center">
 		<mx:Button label="Aggiorna" click="AggiornaEsami()"/>
 		<mx:Button label="Nuovo" id="btnNuovo" click="btnNuovo_click(event)"/>
 		<mx:Button label="Salva" id="btnSalva" click="btnSalva_click(event)"/>
@@ -140,13 +139,17 @@
 	<s:TextInput id="txtVoe_cred" y="174" left="10" width="227" height="50" prompt="Crediti Esame"
 				 restrict="0-9."/>
 	<s:TextInput id="txtVoe_codi" x="10" y="10" width="127" height="50" editable="false" enabled="false" prompt="Codice Esame" />
-	<s:List id="grdEsami" left="10" top="232" bottom="10" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)" >
+	<s:SpinnerList id="grdEsami" left="10" top="232" bottom="58" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)">
 		<s:itemRenderer>
 			<fx:Component>
 				<s:ItemRenderer>
-					<s:Group>
-						<s:Label text="{data.voe_desc}" />
-					</s:Group>
+					<s:VGroup>
+						<s:Label fontSize="13" text="{data.voe_desc}" fontWeight="bold" />
+						<s:HGroup>
+							<s:Label fontSize="13" text="sostenuto il {data.voe_data} con il voto " /> 
+							<s:Label fontSize="13" color="#FF0000" text="{data.val_desc}" fontWeight="bold" />
+						</s:HGroup>
+					</s:VGroup>
 				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>
@@ -165,7 +168,7 @@
 				</mx:itemRenderer>
 			</mx:DataGridColumn>
 		</mx:columns>-->
-	</s:List>
+	</s:SpinnerList>
 	<mx:Text right="100" top="177" width="106" text="Totale Esami Sostenuti:"/>
 	<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
 			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>
