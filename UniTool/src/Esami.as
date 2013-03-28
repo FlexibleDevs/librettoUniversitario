@@ -1,5 +1,7 @@
 package
 {
+	import mx.collections.ArrayList;
+
 	public class Esami
 	{
 		import flash.data.SQLConnection;

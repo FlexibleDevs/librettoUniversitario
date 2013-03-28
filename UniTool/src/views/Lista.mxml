@@ -3,10 +3,16 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="Esami_creationComplete(event)">
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
 			import mx.controls.Alert;
+			import mx.controls.List;
 			import mx.events.CloseEvent;
 			import mx.formatters.DateFormatter;
 			import mx.managers.CursorManager;
+			import mx.utils.ObjectUtil;
+			
+			import spark.components.List;
 			
 			[Bindable]
 			private var dttApp:DateFormatter = new DateFormatter();
@@ -22,9 +28,9 @@
 			private var strTitle:String;
 			
 			[Bindable]
-			private var arcEsami:Array;
+			private var arcEsami:ArrayList;
 			[Bindable]
-			private var arcVoti:Array;
+			private var arcVoti:ArrayList;
 			
 			private function Esami_creationComplete(e:Event):void{
 				AggiornaVoti();
@@ -55,16 +61,15 @@
 				txtVoe_codi.text=null;
 				txtVoe_desc.text=null;
 				txtVoe_cred.text=null;
-				txtVoe_data.text='';
 				txtVoe_desc.setFocus();	
 			}
 			
 			private function btnSalva_click(e:Event):void{
-				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.text != null && txtVoe_data.text != ''){
+				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.selectedDate != null){
 					CursorManager.setBusyCursor();
 					if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
-											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.text)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+chkMedia.selected+
+											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+cmbMedia.selectedItem.data+
 											 " where voe_codi = "+txtVoe_codi.text,null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
@@ -73,7 +78,7 @@
 						}
 					}else{
 						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
-										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.text)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+chkMedia.selected+" from tabella_votiesami",null)){
+										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+cmbMedia.selectedItem.data+" from tabella_votiesami",null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
 						}else{
@@ -89,7 +94,7 @@
 				txtVoe_codi.text=grdEsami.selectedItem.voe_codi;
 				txtVoe_desc.text=grdEsami.selectedItem.voe_desc;
 				txtVoe_cred.text=grdEsami.selectedItem.voe_cred;
-				txtVoe_data.text=grdEsami.selectedItem.voe_data;
+				txtVoe_data.selectedDate=grdEsami.selectedItem.voe_data;
 				var intval_codi:int=0;
 				for(var i:int=0;i<cmbVal_codi.dataProvider.length;i++){
 					if(cmbVal_codi.dataProvider[i].val_codi == grdEsami.selectedItem.val_codi){
@@ -101,38 +106,51 @@
 			}
 			
 			private function AggiornaEsami():void{
-				arcEsami=_esami.getEsami(1);
+				arcEsami=new ArrayList(_esami.getEsami(1));
 			}
 			
 			private function AggiornaVoti():void{
-				arcVoti=_esami.getValutazioni();
+				arcVoti=new ArrayList(_esami.getValutazioni());
 			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<mx:NumberFormatter precision="2" id="formatter" />
 	</fx:Declarations>
-	<mx:Label x="11" y="66" text="Descrizione " width="112"/>
-	<mx:Label x="10" y="120" text="Voto esame" width="112"/>
-	<mx:Label x="243" y="122" text="Includi nella media" width="148"/>
-	<mx:Label x="10" y="12" width="112" height="48" text="Codice esame" textAlign="left"/>
-	<mx:Label x="244" y="10" width="98" height="50" text="Data esame"/>
-	<mx:Label x="10" y="178" text="Crediti esame" width="112"/>
+	<mx:Label right="10" bottom="459" width="94" height="50" fontSize="25" fontWeight="bold"
+			  text="{grdEsami.dataProvider.length}" textAlign="center"/>
 	<mx:HBox left="10" right="10" bottom="10" horizontalAlign="center">
 		<mx:Button label="Aggiorna" click="AggiornaEsami()"/>
 		<mx:Button label="Nuovo" id="btnNuovo" click="btnNuovo_click(event)"/>
 		<mx:Button label="Salva" id="btnSalva" click="btnSalva_click(event)"/>
 	</mx:HBox>
-	<mx:ComboBox id="cmbVal_codi" x="130" y="118" width="105" height="50" dataProvider="{arcVoti}"
-				 labelField="val_desc"/>
-	<mx:TextInput id="txtVoe_desc" y="64" left="131" right="9" height="50" fontSize="20"
-				  maxChars="100"/>
-	<mx:TextInput id="txtVoe_cred" x="130" y="176" width="105" height="50" restrict="0-9."/>
-	<mx:TextInput id="txtVoe_codi" x="130" y="10" width="106" height="50" disabledColor="#000000"
-				  editable="false" enabled="false"/>
-	<mx:DataGrid id="grdEsami" left="10" top="414" bottom="40" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true"
-				 doubleClick="grdEsami_doubleClick(event)" variableRowHeight="true" >
-		<mx:columns>
+	<!--<s:ComboBox id="cmbVal_codi" y="118" left="10" width="127" height="50"
+				dataProvider="{arcVoti}" labelField="val_desc"
+				prompt="Valutazione"/>-->
+	<s:SpinnerListContainer x="263" y="118" width="60" height="50">
+		<s:SpinnerList id="cmbMedia" width="100%" height="100%" labelField="label" fontSize="20" >
+			<s:ArrayList>
+				<fx:Object label="No" data="0" />
+				<fx:Object label="Si" data="1" />
+			</s:ArrayList>
+		</s:SpinnerList>
+	</s:SpinnerListContainer>
+	<s:TextInput id="txtVoe_desc" y="64" left="10" right="9" height="50" fontSize="20"
+				  maxChars="100" prompt="Descrizione Esame" />
+	<s:TextInput id="txtVoe_cred" y="174" left="10" width="227" height="50" prompt="Crediti Esame"
+				 restrict="0-9."/>
+	<s:TextInput id="txtVoe_codi" x="10" y="10" width="127" height="50" editable="false" enabled="false" prompt="Codice Esame" />
+	<s:List id="grdEsami" left="10" top="232" bottom="10" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)" >
+		<s:itemRenderer>
+			<fx:Component>
+				<s:ItemRenderer>
+					<s:Group>
+						<s:Label text="{data.voe_desc}" />
+					</s:Group>
+				</s:ItemRenderer>
+			</fx:Component>
+		</s:itemRenderer>
+		<!--<mx:columns>
 			<mx:DataGridColumn headerText="ID" dataField="voe_codi" width="60"/>
 			<mx:DataGridColumn headerText="Descrizione" dataField="voe_desc" wordWrap="true"/>
 			<mx:DataGridColumn headerText="Data" dataField="voe_data" width="80"/>
@@ -146,12 +164,15 @@
 					</fx:Component>
 				</mx:itemRenderer>
 			</mx:DataGridColumn>
-		</mx:columns>
-	</mx:DataGrid>
-	<mx:Label right="82" top="229" width="118" text="Totale Esami:"/>
-	<mx:Label text="{grdEsami.dataProvider.length}" fontWeight="bold" width="64" right="10" top="227"/>
-	<mx:Image right="100" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
-			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="199"/>
-	<mx:DateField id="txtVoe_data" x="350" y="10" width="150" height="50" formatString="DD/MM/YYYY"/>
-	<mx:CheckBox id="chkMedia" x="399" y="126"/>
+		</mx:columns>-->
+	</s:List>
+	<mx:Text right="100" top="177" width="106" text="Totale Esami Sostenuti:"/>
+	<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
+			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>
+	<s:DateSpinner id="txtVoe_data" x="145" y="10" height="50" displayMode="date" locale="it" />
+	<s:SpinnerListContainer x="10" y="116" width="127" height="50">
+		<s:SpinnerList id="cmbVal_codi" fontSize="20" height="100%" width="100%" labelField="val_desc" selectedIndex="1" dataProvider="{arcVoti}" />
+	</s:SpinnerListContainer>
+	<s:Label x="144" y="122" width="111" height="44" text="Includi nella media"/>
+	<!--<mx:DateField id="txtVoe_data" x="145" y="10" width="325" height="50" formatString="DD/MM/YYYY" />-->
 </s:View>

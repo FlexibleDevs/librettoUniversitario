@@ -12,7 +12,7 @@
 				if(_user.status()){
 					//vskAll.selectedChild=cvsViste;
 				}else{
-					//vskAll.selectedChild=cvsMenu;
+					//vskAll.selectedChild=cvsMenu; ijoijojo
 				}
 			}
 			
