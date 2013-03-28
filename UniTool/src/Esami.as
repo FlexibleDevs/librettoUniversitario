@@ -33,13 +33,13 @@ package
 			stmt.text = "SELECT  t.voe_codi,t.voe_desc,"+
 							   "t.voe_cred,val.val_desc,t.val_codi,"+
 							   "strftime('%d/%m/%Y',t.voe_data) as voe_data "+
-					"from tabella_votiesami t "+
-					"left join tabella_valutazioni val "+
-					"on t.val_codi = val.val_codi "+
-					"where (case when "+opzione+" = 0 then 1 " +
-							"when "+opzione+" = 1 and ifnull(t.val_codi,0) > 0 then 1 " +
-							"when "+opzione+" = 2 and ifnull(t.val_codi,0) = 0 then 1 " +
-							"else 0 end) = 1";	
+						"from tabella_votiesami t "+
+						"left join tabella_valutazioni val "+
+						"on t.val_codi = val.val_codi "+
+						"where (case when "+opzione+" = 0 then 1 " +
+								"when "+opzione+" = 1 and ifnull(t.val_codi,0) > 0 then 1 " +
+								"when "+opzione+" = 2 and ifnull(t.val_codi,0) = 0 then 1 " +
+								"else 0 end) = 1";	
 			stmt.execute();
 			
 			var result:Array = stmt.getResult().data;

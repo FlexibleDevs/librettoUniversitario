@@ -36,7 +36,7 @@
 				AggiornaVoti();
 				AggiornaEsami();
 				
-				strTitle=_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+				strTitle="Esami sostenuti - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
 				
 				dttApp.formatString='DD/MM/YYYY';
 				dttApp02.formatString='YYYY-MM-DD';
@@ -66,7 +66,7 @@
 			
 			private function btnSalva_click(e:Event):void{
 				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.selectedDate != null){
-					if(txtVoe_codi.text.length > 0){
+					//if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
 											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+cmbMedia.selectedItem.data+
 											 " where voe_codi = "+txtVoe_codi.text,null)){
@@ -75,7 +75,7 @@
 						}else{
 							Alert.show("Errore nell'aggiornamento dell'esame !");
 						}
-					}else{
+					/*}else{
 						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
 										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+cmbMedia.selectedItem.data+" from tabella_votiesami",null)){
 							AggiornaEsami();
@@ -83,7 +83,7 @@
 						}else{
 							Alert.show("Errore nell'inserimento dell'esame !");
 						}
-					}
+					}*/
 				}else{
 					Alert.show("Attenzione campi obbligatori mancanti !");
 				}
@@ -116,12 +116,12 @@
 	<fx:Declarations>
 		<mx:NumberFormatter precision="2" id="formatter" />
 	</fx:Declarations>
-	<mx:Label right="10" bottom="459" width="94" height="50" fontSize="25" fontWeight="bold"
+	<mx:Label right="10" bottom="459" width="94" height="50" fontSize="28" fontWeight="bold"
 			  text="{grdEsami.dataProvider.length}" textAlign="center"/>
 	<mx:HBox left="10" right="10" bottom="10" height="40" horizontalAlign="center">
 		<mx:Button label="Aggiorna" click="AggiornaEsami()"/>
-		<mx:Button label="Nuovo" id="btnNuovo" click="btnNuovo_click(event)"/>
 		<mx:Button label="Salva" id="btnSalva" click="btnSalva_click(event)"/>
+		<mx:Button label="Riepilogo" id="btnRiepilogo" />
 	</mx:HBox>
 	<!--<s:ComboBox id="cmbVal_codi" y="118" left="10" width="127" height="50"
 				dataProvider="{arcVoti}" labelField="val_desc"
@@ -136,10 +136,10 @@
 	</s:SpinnerListContainer>
 	<s:TextInput id="txtVoe_desc" y="64" left="10" right="9" height="50" fontSize="20"
 				  maxChars="100" prompt="Descrizione Esame" />
-	<s:TextInput id="txtVoe_cred" y="174" left="10" width="227" height="50" prompt="Crediti Esame"
+	<s:TextInput id="txtVoe_cred" y="174" left="10" width="127" height="50" prompt="Crediti Esame"
 				 restrict="0-9."/>
 	<s:TextInput id="txtVoe_codi" x="10" y="10" width="127" height="50" editable="false" enabled="false" prompt="Codice Esame" />
-	<s:SpinnerList id="grdEsami" left="10" top="232" bottom="58" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)">
+	<s:List id="grdEsami" left="10" top="232" bottom="58" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)" visible="false">
 		<s:itemRenderer>
 			<fx:Component>
 				<s:ItemRenderer>
@@ -168,10 +168,11 @@
 				</mx:itemRenderer>
 			</mx:DataGridColumn>
 		</mx:columns>-->
-	</s:SpinnerList>
-	<mx:Text right="100" top="177" width="106" text="Totale Esami Sostenuti:"/>
-	<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
-			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>
+	</s:List>
+	<mx:Text right="103" top="183" width="235" height="34" fontSize="22"
+			 text="Totale Esami Sostenuti:" textAlign="center"/>
+	<!--<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
+			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>-->
 	<s:DateSpinner id="txtVoe_data" x="145" y="10" height="50" displayMode="date" locale="it" />
 	<s:SpinnerListContainer x="10" y="116" width="127" height="50">
 		<s:SpinnerList id="cmbVal_codi" fontSize="20" height="100%" width="100%" labelField="val_desc" selectedIndex="1" dataProvider="{arcVoti}" />
