@@ -23,9 +23,9 @@
 		
 	</fx:Declarations>
 	
-	<s:ViewNavigator id="viewPiano" label="Piano di studi" width="100%" height="100%" firstView="views.Piano" />
 	<s:ViewNavigator id="viewEsami" label="Esami sostenuti" width="100%" height="100%" firstView="views.Lista" />
 	<s:ViewNavigator id="viewAgenda" label="Agenda" width="100%" height="100%" firstView="views.Agenda" />
 	<s:ViewNavigator id="viewStat" label="Statistiche" width="100%" height="100%" firstView="views.Stat" />
+	<s:ViewNavigator id="viewProfilo" label="Profilo" width="100%" height="100%" firstView="views.Profilo" />
 	
 </s:TabbedViewNavigatorApplication>
