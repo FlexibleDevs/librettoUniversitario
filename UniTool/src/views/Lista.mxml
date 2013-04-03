@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" title="{strTitle}"
-		xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="Esami_creationComplete(event)">
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		creationComplete="Esami_creationComplete(event)" title="{strTitle}">
 	<fx:Script>
 		<![CDATA[
+			import components.AlertDefault;
+			
 			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
-			import mx.controls.Alert;
-			import mx.controls.List;
 			import mx.events.CloseEvent;
 			import mx.formatters.DateFormatter;
 			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
 			import mx.utils.ObjectUtil;
 			
 			import spark.components.List;
+			import spark.components.TitleWindow;
 			
 			[Bindable]
 			private var dttApp:DateFormatter = new DateFormatter();
@@ -28,9 +32,11 @@
 			private var strTitle:String;
 			
 			[Bindable]
-			private var arcEsami:ArrayList;
+			private var arcEsami:ArrayCollection;
 			[Bindable]
-			private var arcVoti:ArrayList;
+			private var arcVoti:ArrayCollection;
+			
+			private var dtfDataEsame:Date;
 			
 			private function Esami_creationComplete(e:Event):void{
 				AggiornaVoti();
@@ -43,18 +49,18 @@
 			}
 			
 			public function del_click(obj:Object):void{
-				Alert.show("Sicuro di voler eliminare l'esame di " + obj.voe_desc + " ?", "Manager", Alert.YES | Alert.NO, this, CancellaEsame, null, Alert.YES);
+				//Alert.show("Sicuro di voler eliminare l'esame di " + obj.voe_desc + " ?", "Manager", Alert.YES | Alert.NO, this, CancellaEsame, null, Alert.YES);
 			}
 			
 			private function CancellaEsame(e:CloseEvent):void{
-				if(e.detail == Alert.YES){
-					if(_esami.callquery("delete tabella_votiesami from tabella_votiesami where voe_codi = "+grdEsami.selectedItem.voe_codi,null)){
-						AggiornaEsami();
-						btnNuovo_click(null);
-					}else{
-						Alert.show("Impossibile eliminare l'esame !");
-					}
-				}
+//				if(e.detail == Alert.YES){
+//					if(_esami.callquery("delete tabella_votiesami from tabella_votiesami where voe_codi = "+grdEsami.selectedItem.voe_codi,null)){
+//						AggiornaEsami();
+//						btnNuovo_click(null);
+//					}else{
+//						//Alert.show("Impossibile eliminare l'esame !");
+//					}
+//				}
 			}
 			
 			private function btnNuovo_click(e:Event):void{
@@ -65,15 +71,15 @@
 			}
 			
 			private function btnSalva_click(e:Event):void{
-				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && txtVoe_data.selectedDate != null){
-					//if(txtVoe_codi.text.length > 0){
+				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && dtfDataEsame != null){
+					if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
-											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+cmbMedia.selectedItem.data+
+											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+ rbtnSiMedia.selected == true ? "Si" : "No" +
 											 " where voe_codi = "+txtVoe_codi.text,null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
 						}else{
-							Alert.show("Errore nell'aggiornamento dell'esame !");
+							ShowAlert("Errore nell'aggiornamento dell'esame !!!",1);
 						}
 					/*}else{
 						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
@@ -84,9 +90,22 @@
 							Alert.show("Errore nell'inserimento dell'esame !");
 						}
 					}*/
-				}else{
-					Alert.show("Attenzione campi obbligatori mancanti !");
-				}
+						}
+					}else{
+						ShowAlert("Attenzione campi obbligatori mancanti !",1);
+						//Alert.show("Attenzione campi obbligatori mancanti !");
+					}
+				
+			}
+			
+			private function ShowAlert(s:String, i:int):void {
+				// Create a non-modal TitleWindow container.
+				var AlertWindow:components.AlertDefault=
+					PopUpManager.createPopUp(this, components.AlertDefault, true) as components.AlertDefault;
+				(AlertWindow as components.AlertDefault).SetAlertText(s); 
+				(AlertWindow as components.AlertDefault).ViewButtons(1);
+				
+				PopUpManager.centerPopUp(AlertWindow);
 			}
 			
 			private function grdEsami_doubleClick(e:Event):void{
@@ -105,49 +124,55 @@
 			}
 			
 			private function AggiornaEsami():void{
-				arcEsami=new ArrayList(_esami.getEsami(1));
+				arcEsami=new ArrayCollection(_esami.getEsami(1));
 			}
 			
 			private function AggiornaVoti():void{
-				arcVoti=new ArrayList(_esami.getValutazioni());
+				arcVoti=new ArrayCollection(_esami.getValutazioni());
 			}
+			
+			protected function btnConfermaData_clickHandler(event:MouseEvent):void
+			{
+				dtfDataEsame = txtVoe_data.selectedDate;
+				btnData.label = dateFormatter.format(txtVoe_data.selectedDate);
+				btnData.closeDropDown();
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
-		<mx:NumberFormatter precision="2" id="formatter" />
+		<mx:NumberFormatter id="formatter" precision="2"/>
+		<s:DateTimeFormatter id="dateFormatter" dateTimePattern="dd/MM/yyyy"/>
+		<s:RadioButtonGroup id="radioIncludiMedia"/>
 	</fx:Declarations>
-	<mx:Label right="10" bottom="459" width="94" height="50" fontSize="28" fontWeight="bold"
-			  text="{grdEsami.dataProvider.length}" textAlign="center"/>
-	<mx:HBox left="10" right="10" bottom="10" height="40" horizontalAlign="center">
-		<mx:Button label="Aggiorna" click="AggiornaEsami()"/>
-		<mx:Button label="Salva" id="btnSalva" click="btnSalva_click(event)"/>
-		<mx:Button label="Riepilogo" id="btnRiepilogo" />
-	</mx:HBox>
+	<s:Label right="10" bottom="58" width="94" height="50" fontSize="28" fontWeight="bold"
+			 text="{grdEsami.dataProvider.length}" textAlign="center" verticalAlign="middle"/>
+	<s:HGroup left="10" right="10" bottom="10" height="40" horizontalAlign="center">
+		<s:Button label="Aggiorna" click="AggiornaEsami()"/>
+		<s:Button id="btnSalva" label="Salva" click="btnSalva_click(event)"/>
+		<s:Button id="btnRiepilogo" label="Riepilogo"/>
+	</s:HGroup>
 	<!--<s:ComboBox id="cmbVal_codi" y="118" left="10" width="127" height="50"
 				dataProvider="{arcVoti}" labelField="val_desc"
 				prompt="Valutazione"/>-->
-	<s:SpinnerListContainer x="263" y="118" width="60" height="50">
-		<s:SpinnerList id="cmbMedia" width="100%" height="100%" labelField="label" fontSize="20" >
-			<s:ArrayList>
-				<fx:Object label="No" data="0" />
-				<fx:Object label="Si" data="1" />
-			</s:ArrayList>
-		</s:SpinnerList>
-	</s:SpinnerListContainer>
-	<s:TextInput id="txtVoe_desc" y="64" left="10" right="9" height="50" fontSize="20"
-				  maxChars="100" prompt="Descrizione Esame" />
-	<s:TextInput id="txtVoe_cred" y="174" left="10" width="127" height="50" prompt="Crediti Esame"
-				 restrict="0-9."/>
-	<s:TextInput id="txtVoe_codi" x="10" y="10" width="127" height="50" editable="false" enabled="false" prompt="Codice Esame" />
-	<s:List id="grdEsami" left="10" top="232" bottom="58" right="10" dataProvider="{arcEsami}" doubleClickEnabled="true" doubleClick="grdEsami_doubleClick(event)" visible="false">
+	<s:TextInput id="txtVoe_desc" y="11" left="8" right="315" height="42" fontSize="16"
+				 maxChars="100" prompt="Descrizione esame"/>
+	<s:TextInput id="txtVoe_cred" x="493" y="10" width="122" height="43" fontSize="16"
+				 prompt="Crediti Esame" restrict="0-9."/>
+	<s:TextInput id="txtVoe_codi" visible="false" x="10" y="10" width="127" height="50"
+				 editable="false" enabled="false" prompt="Codice Esame"/>
+	<s:List id="grdEsami" visible="false" left="10" right="10" top="232" bottom="58"
+			dataProvider="{arcEsami}" doubleClick="grdEsami_doubleClick(event)"
+			doubleClickEnabled="true">
 		<s:itemRenderer>
 			<fx:Component>
 				<s:ItemRenderer>
 					<s:VGroup>
-						<s:Label fontSize="13" text="{data.voe_desc}" fontWeight="bold" />
+						<s:Label fontSize="13" fontWeight="bold" text="{data.voe_desc}"/>
 						<s:HGroup>
-							<s:Label fontSize="13" text="sostenuto il {data.voe_data} con il voto " /> 
-							<s:Label fontSize="13" color="#FF0000" text="{data.val_desc}" fontWeight="bold" />
+							<s:Label fontSize="13" text="sostenuto il {data.voe_data} con il voto "/> 
+							<s:Label color="#FF0000" fontSize="13" fontWeight="bold"
+									 text="{data.val_desc}"/>
 						</s:HGroup>
 					</s:VGroup>
 				</s:ItemRenderer>
@@ -169,14 +194,32 @@
 			</mx:DataGridColumn>
 		</mx:columns>-->
 	</s:List>
-	<mx:Text right="103" top="183" width="235" height="34" fontSize="22"
-			 text="Totale Esami Sostenuti:" textAlign="center"/>
+	<s:Label right="114" bottom="58" width="235" height="50" fontSize="22"
+			 text="Totale Esami Sostenuti:" textAlign="center" verticalAlign="middle"/>
 	<!--<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
 			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>-->
-	<s:DateSpinner id="txtVoe_data" x="145" y="10" height="50" displayMode="date" locale="it" />
-	<s:SpinnerListContainer x="10" y="116" width="127" height="50">
-		<s:SpinnerList id="cmbVal_codi" fontSize="20" height="100%" width="100%" labelField="val_desc" selectedIndex="1" dataProvider="{arcVoti}" />
+	
+	<s:SpinnerListContainer x="97" y="57" width="83" height="50">
+		<s:SpinnerList id="cmbVal_codi" width="100%" height="100%" dataProvider="{arcVoti}"
+					   fontSize="16" labelField="val_desc" selectedIndex="1"/>
 	</s:SpinnerListContainer>
-	<s:Label x="144" y="122" width="111" height="44" text="Includi nella media"/>
+	<s:Label x="188" y="61" width="84" height="50" color="#000000" fontSize="16"
+			 text="Includi nella media" verticalAlign="middle"/>
+	<s:Label x="10" y="60" width="78" height="49" fontSize="16" text="Voto conseguito"
+			 verticalAlign="middle"/>
+	<s:CalloutButton id="btnData" x="623" y="10" width="167" label="Data esame">
+		<s:calloutLayout>
+			<s:VerticalLayout horizontalAlign="justify"/>
+		</s:calloutLayout>
+		<s:calloutContent>
+				<s:DateSpinner id="txtVoe_data" color="#000000" displayMode="date" locale="it"/>
+				<s:Button label="Conferma" click="btnConfermaData_clickHandler(event)"/>
+		</s:calloutContent>
+	</s:CalloutButton>
+	<s:HGroup x="280" y="68" width="201" height="32" gap="50" horizontalAlign="center"
+			  verticalAlign="middle">
+		<s:RadioButton id="rbtnSiMedia" label="Si" groupName="radioIncludiMedia"/>
+		<s:RadioButton id="rbtnNoMedia" label="No" groupName="radioIncludiMedia"/>
+	</s:HGroup>
 	<!--<mx:DateField id="txtVoe_data" x="145" y="10" width="325" height="50" formatString="DD/MM/YYYY" />-->
 </s:View>

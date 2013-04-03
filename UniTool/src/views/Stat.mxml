@@ -7,7 +7,6 @@
 		<![CDATA[
 			import mx.charts.HitData;
 			import mx.charts.series.items.LineSeriesItem;
-			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			import mx.formatters.DateFormatter;
 			import mx.formatters.Formatter;
@@ -99,7 +98,7 @@
 			</mx:LineSeries>
 		</mx:series>
 	</mx:LineChart>
-	<mx:DataGrid id="grdVoti" left="10" bottom="5" right="10" dataProvider="{userRequest06.lastResult.users.user}" height="48">
+	<!-- <mx:DataGrid id="grdVoti" left="10" bottom="5" right="10" dataProvider="{userRequest06.lastResult.users.user}" height="48">
 		<mx:columns>
 			<mx:DataGridColumn headerText="18" dataField="a"/>
 			<mx:DataGridColumn headerText="19" dataField="b"/>
@@ -129,5 +128,5 @@
 			<mx:Label y="10" text="Crediti" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" textDecoration="underline" horizontalCenter="0"/>
 			<mx:Label y="62" text="{(userRequest09.lastResult.users.user.Crediti as int).toString()}" textAlign="center" height="90" fontSize="20" fontStyle="italic" fontWeight="bold" color="#FF0000" width="100%"/>
 		</mx:Canvas>
-	</mx:HBox>
+	</mx:HBox> -->
 </s:View>
