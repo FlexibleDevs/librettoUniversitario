@@ -6,6 +6,8 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
+			
 			import mx.controls.Alert;
 			import mx.events.FlexEvent;
 			
@@ -23,6 +25,7 @@
 			protected function User_creationCompleteHandler(event:FlexEvent):void
 			{
 				PopoloInfo();
+				txtusr_nome.setFocus();
 			}
 			
 			protected function UpdateUser():void
@@ -61,16 +64,26 @@
 			
 			
 			
+			protected function link_clickHandler(event:MouseEvent):void
+			{
+				if(txtusr_link.text.length > 0){
+					navigateToURL(new URLRequest(txtusr_link.text),"_blank");
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:TextInput id="txtusr_nome" y="64" width="100%" height="50" fontSize="20" maxChars="100" prompt="Nome" />
-	<s:TextInput id="txtusr_cogn" width="100%" height="50" fontSize="20" maxChars="100" prompt="Cognome" />
-	<s:TextInput id="txtusr_faco" width="100%" height="50" fontSize="20" maxChars="100" prompt="Facoltà" />
-	<s:TextInput id="txtusr_link" width="100%" height="50" fontSize="20" maxChars="100" prompt="Link facoltà"/>
+	<s:TextInput id="txtusr_nome" y="64" width="100%" height="50" fontSize="20" maxChars="100" prompt="Nome" tabIndex="1" />
+	<s:TextInput id="txtusr_cogn" width="100%" height="50" fontSize="20" maxChars="100" prompt="Cognome" tabIndex="2" />
+	<s:TextInput id="txtusr_faco" width="100%" height="50" fontSize="20" maxChars="100" prompt="Facoltà" tabIndex="3" />
+	<s:HGroup width="100%">
+		<s:TextInput id="txtusr_link" width="100%" height="50" fontSize="20" maxChars="100" prompt="Link facoltà" tabIndex="4" />
+		<s:Image width="50" height="50" source="image/link.jpg" click="link_clickHandler(event)" useHandCursor="true" buttonMode="true"/>
+	</s:HGroup>
 	<s:HGroup width="100%" bottom="10" horizontalAlign="center">
 		<s:Button label="Aggiorna" click="UpdateUser()" fontSize="20" />
 	</s:HGroup>
