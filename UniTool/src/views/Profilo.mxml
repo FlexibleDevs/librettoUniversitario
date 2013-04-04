@@ -8,7 +8,6 @@
 		<![CDATA[
 			import flash.net.navigateToURL;
 			
-			import mx.controls.Alert;
 			import mx.events.FlexEvent;
 			
 			import spark.globalization.StringTools;
