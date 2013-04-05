@@ -74,26 +74,24 @@
 				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && dtfDataEsame != null){
 					if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
-											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+ rbtnSiMedia.selected == true ? "Si" : "No" +
+											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+ rbtnSiMedia.selected == true ? "1" : "0" +
 											 " where voe_codi = "+txtVoe_codi.text,null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
 						}else{
 							ShowAlert("Errore nell'aggiornamento dell'esame !!!",1);
 						}
-					/*}else{
+					}else{
 						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
-										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+cmbMedia.selectedItem.data+" from tabella_votiesami",null)){
+										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+rbtnSiMedia.selected == true ? "1" : "0" +" from tabella_votiesami",null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
 						}else{
-							Alert.show("Errore nell'inserimento dell'esame !");
+							ShowAlert("Errore nell'inserimento dell'esame !",1);
 						}
-					}*/
-						}
+					}
 					}else{
 						ShowAlert("Attenzione campi obbligatori mancanti !",1);
-						//Alert.show("Attenzione campi obbligatori mancanti !");
 					}
 				
 			}
