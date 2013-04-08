@@ -81,12 +81,12 @@
 	<s:TextInput id="txtusr_faco" width="100%" height="50" fontSize="20" maxChars="100" prompt="Facoltà" tabIndex="3" />
 	<s:HGroup width="100%">
 		<s:TextInput id="txtusr_link" width="100%" height="50" fontSize="20" maxChars="100" prompt="Link facoltà" tabIndex="4" />
-		<s:Image width="50" height="50" source="image/link.jpg" click="link_clickHandler(event)" useHandCursor="true" buttonMode="true"/>
+		<s:Image width="50" height="50" source="image/arrow1.png" click="link_clickHandler(event)" useHandCursor="true" buttonMode="true" tabEnabled="false"/>
 	</s:HGroup>
-	<s:HGroup width="100%" bottom="10" horizontalAlign="center">
+	<s:HGroup width="100%" bottom="10" horizontalAlign="center" tabEnabled="false">
 		<s:Button label="Aggiorna" click="UpdateUser()" fontSize="20" />
 	</s:HGroup>
-	<s:HGroup width="100%" bottom="10" horizontalAlign="center">
+	<s:HGroup width="100%" bottom="10" horizontalAlign="center" tabEnabled="false">
 		<s:Label id="lblUpdate" height="50" fontSize="17"/>
 	</s:HGroup>
 </s:View>
