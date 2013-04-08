@@ -31,8 +31,10 @@ package
 		
 		public function getEsami(opzione:int):Array{
 			stmt.text = "SELECT  t.voe_codi,t.voe_desc,"+
-							   "t.voe_cred,val.val_desc,t.val_codi,"+
-							   "strftime('%d/%m/%Y',t.voe_data) as voe_data "+
+							   "t.voe_cred,val.val_desc,t.val_codi,t.media,"+
+							   "strftime('%d/%m/%Y',t.voe_data) as voe_data, " +
+							   "strftime('%m/%d/%Y',t.voe_data) as voe_data2 " +
+							   
 						"from tabella_votiesami t "+
 						"left join tabella_valutazioni val "+
 						"on t.val_codi = val.val_codi "+

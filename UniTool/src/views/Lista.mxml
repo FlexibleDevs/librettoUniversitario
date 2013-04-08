@@ -7,13 +7,15 @@
 		<![CDATA[
 			import components.AlertDefault;
 			
+			import flash.sampler.NewObjectSample;
+			
 			import mx.collections.ArrayCollection;
 			import mx.collections.IList;
 			import mx.events.CloseEvent;
 			import mx.formatters.DateFormatter;
 			import mx.managers.CursorManager;
 			import mx.managers.PopUpManager;
-			import mx.utils.ObjectUtil; 
+			import mx.utils.ObjectUtil;
 			
 			import spark.components.List;
 			import spark.components.TitleWindow;
@@ -35,8 +37,10 @@
 			private var arcEsami:ArrayCollection;
 			[Bindable]
 			private var arcVoti:ArrayCollection;
-			
+			[Bindable]
 			private var dtfDataEsame:Date;
+			
+			private var blnIncludiMedia:Boolean = false;
 			
 			private function Esami_creationComplete(e:Event):void{
 				AggiornaVoti();
@@ -68,13 +72,21 @@
 				txtVoe_desc.text=null;
 				txtVoe_cred.text=null;
 				txtVoe_desc.setFocus();	
+				txtVoe_data.selectedDate = new Date();
+				dtfDataEsame = new Date();
+				rbtnNoMedia.selected = false;
+				rbtnSiMedia.selected = false;
+				btnData.label = "Data esame";
+				cmbVal_codi.selectedIndex = 0;
 			}
 			
 			private function btnSalva_click(e:Event):void{
 				if(txtVoe_desc.text != null && txtVoe_desc.text != '' && txtVoe_cred.text != null && txtVoe_cred.text != '' && dtfDataEsame != null){
+					var strMedia:String = (rbtnSiMedia.selected == true) ? "true" : "false";
+					
 					if(txtVoe_codi.text.length > 0){
 						if(_esami.callquery("update tabella_votiesami "+
-											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+ rbtnSiMedia.selected == true ? "1" : "0" +
+											"set voe_desc = '"+txtVoe_desc.text+"',	voe_cred = "+txtVoe_cred.text+", voe_data = '"+dttApp02.format(txtVoe_data.selectedDate)+"', val_codi = "+cmbVal_codi.selectedItem.val_codi+", media = "+ strMedia +
 											 " where voe_codi = "+txtVoe_codi.text,null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
@@ -82,8 +94,9 @@
 							ShowAlert("Errore nell'aggiornamento dell'esame !!!",1);
 						}
 					}else{
+						
 						if(_esami.callquery("insert into tabella_votiesami(voe_codi,voe_desc,voe_cred,voe_data,val_codi,usr_codi,media) " +
-										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+rbtnSiMedia.selected == true ? "1" : "0" +" from tabella_votiesami",null)){
+										"select max(voe_codi)+1,'"+txtVoe_desc.text+"',"+txtVoe_cred.text+",'"+dttApp02.format(txtVoe_data.selectedDate)+"',"+cmbVal_codi.selectedItem.val_codi+",0,"+ strMedia +" from tabella_votiesami",null)){
 							AggiornaEsami();
 							btnNuovo_click(null);
 						}else{
@@ -110,7 +123,17 @@
 				txtVoe_codi.text=grdEsami.selectedItem.voe_codi;
 				txtVoe_desc.text=grdEsami.selectedItem.voe_desc;
 				txtVoe_cred.text=grdEsami.selectedItem.voe_cred;
-				txtVoe_data.selectedDate=grdEsami.selectedItem.voe_data;
+				dtfDataEsame = new Date(grdEsami.selectedItem.voe_data2);
+				txtVoe_data.selectedDate = new Date(grdEsami.selectedItem.voe_data2); 
+				btnData.label = grdEsami.selectedItem.voe_data;
+				blnIncludiMedia = grdEsami.selectedItem.media;
+				
+				if(blnIncludiMedia == true){
+					rbtnSiMedia.selected = true;
+				} else {
+					rbtnNoMedia.selected = true;
+				}
+				
 				var intval_codi:int=0;
 				for(var i:int=0;i<cmbVal_codi.dataProvider.length;i++){
 					if(cmbVal_codi.dataProvider[i].val_codi == grdEsami.selectedItem.val_codi){
@@ -143,13 +166,8 @@
 		<s:DateTimeFormatter id="dateFormatter" dateTimePattern="dd/MM/yyyy"/>
 		<s:RadioButtonGroup id="radioIncludiMedia"/>
 	</fx:Declarations>
-	<s:Label right="10" bottom="58" width="94" height="50" fontSize="28" fontWeight="bold"
+	<s:Label right="13" bottom="6" width="77" height="30" fontSize="16" fontWeight="bold"
 			 text="{grdEsami.dataProvider.length}" textAlign="center" verticalAlign="middle"/>
-	<s:HGroup left="10" right="10" bottom="10" height="40" horizontalAlign="center">
-		<s:Button label="Aggiorna" click="AggiornaEsami()"/>
-		<s:Button id="btnSalva" label="Salva" click="btnSalva_click(event)"/>
-		<s:Button id="btnRiepilogo" label="Riepilogo"/>
-	</s:HGroup>
 	<!--<s:ComboBox id="cmbVal_codi" y="118" left="10" width="127" height="50"
 				dataProvider="{arcVoti}" labelField="val_desc"
 				prompt="Valutazione"/>-->
@@ -159,49 +177,32 @@
 				 prompt="Crediti Esame" restrict="0-9."/>
 	<s:TextInput id="txtVoe_codi" visible="false" x="10" y="10" width="127" height="50"
 				 editable="false" enabled="false" prompt="Codice Esame"/>
-	<s:List id="grdEsami" visible="false" left="10" right="10" top="232" bottom="58"
+	<s:List id="grdEsami" visible="true" left="-1" right="0" top="115" bottom="44"
 			dataProvider="{arcEsami}" doubleClick="grdEsami_doubleClick(event)"
-			doubleClickEnabled="true">
+			doubleClickEnabled="true" contentBackgroundColor="#FFFFFF" selectionColor="#FFFFFF">
 		<s:itemRenderer>
 			<fx:Component>
 				<s:ItemRenderer>
-					<s:VGroup>
-						<s:Label fontSize="13" fontWeight="bold" text="{data.voe_desc}"/>
-						<s:HGroup>
-							<s:Label fontSize="13" text="sostenuto il {data.voe_data} con il voto "/> 
-							<s:Label color="#FF0000" fontSize="13" fontWeight="bold"
+					<s:HGroup paddingLeft="10" height="30" horizontalAlign="center">
+						<s:Label fontSize="16" height="30" fontWeight="bold" text="{data.voe_desc}"/>
+						<s:Label fontSize="13" height="30" text="sostenuto il {data.voe_data} con il voto "/> 
+						<s:Label color="#FF0000" height="30" fontSize="13" fontWeight="bold"
 									 text="{data.val_desc}"/>
-						</s:HGroup>
-					</s:VGroup>
+					</s:HGroup>
 				</s:ItemRenderer>
 			</fx:Component>
 		</s:itemRenderer>
-		<!--<mx:columns>
-			<mx:DataGridColumn headerText="ID" dataField="voe_codi" width="60"/>
-			<mx:DataGridColumn headerText="Descrizione" dataField="voe_desc" wordWrap="true"/>
-			<mx:DataGridColumn headerText="Data" dataField="voe_data" width="80"/>
-			<mx:DataGridColumn headerText="Valutazione" fontSize="13" dataField="val_desc" width="80"/>
-			<mx:DataGridColumn headerText="Crediti" dataField="voe_cred" width="80"/>
-			<mx:DataGridColumn width="30">
-				<mx:itemRenderer>
-					<fx:Component>
-						<mx:Image width="30" height="50" source="image/elimina.png" useHandCursor="true" mouseChildren="false" buttonMode="true"
-								  toolTip="Elimina Esame" click="outerDocument.del_click(data)" />
-					</fx:Component>
-				</mx:itemRenderer>
-			</mx:DataGridColumn>
-		</mx:columns>-->
 	</s:List>
-	<s:Label right="114" bottom="58" width="235" height="50" fontSize="22"
+	<s:Label right="98" bottom="6" width="193" height="30" fontSize="16"
 			 text="Totale Esami Sostenuti:" textAlign="center" verticalAlign="middle"/>
 	<!--<mx:Image right="212" source="image/pdf.gif" width="21" height="20" toolTip="Esporta la lista in PDF" useHandCursor="true" buttonMode="true"
 			  mouseChildren="false" click="navigateToURL(new URLRequest('http://'+/*strUrl+*/'/pdf_esami.php'),'_blank')" y="205"/>-->
 	
-	<s:SpinnerListContainer x="97" y="57" width="83" height="50">
+	<s:SpinnerListContainer x="96" y="57" width="98" height="50">
 		<s:SpinnerList id="cmbVal_codi" width="100%" height="100%" dataProvider="{arcVoti}"
 					   fontSize="16" labelField="val_desc" selectedIndex="1"/>
 	</s:SpinnerListContainer>
-	<s:Label x="188" y="61" width="84" height="50" color="#000000" fontSize="16"
+	<s:Label x="202" y="57" width="84" height="50" color="#000000" fontSize="16"
 			 text="Includi nella media" verticalAlign="middle"/>
 	<s:Label x="10" y="60" width="78" height="49" fontSize="16" text="Voto conseguito"
 			 verticalAlign="middle"/>
@@ -214,10 +215,13 @@
 				<s:Button label="Conferma" click="btnConfermaData_clickHandler(event)"/>
 		</s:calloutContent>
 	</s:CalloutButton>
-	<s:HGroup x="280" y="68" width="201" height="32" gap="50" horizontalAlign="center"
+	<s:HGroup x="294" y="68" width="187" height="32" gap="40" horizontalAlign="left"
 			  verticalAlign="middle">
 		<s:RadioButton id="rbtnSiMedia" label="Si" groupName="radioIncludiMedia"/>
 		<s:RadioButton id="rbtnNoMedia" label="No" groupName="radioIncludiMedia"/>
 	</s:HGroup>
+	<s:Button x="495" y="57" width="120" label="Nuovo" click="btnNuovo_click(event)"/>
+	<s:Button id="btnSalva" x="623" y="57" label="Salva" click="btnSalva_click(event)"/>
+	<s:Button id="btnRiepilogo" x="696" y="57" label="Riepilogo"/>
 	<!--<mx:DateField id="txtVoe_data" x="145" y="10" width="325" height="50" formatString="DD/MM/YYYY" />-->
 </s:View>
