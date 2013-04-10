@@ -32,7 +32,7 @@
 				dttApp02.formatString='YYYY-MM-DD';
 				
 				//prendo codice utente da file config
-				userRequest10.send();
+				//userRequest10.send();
 				
 				strTitle="Statistiche - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
 			}

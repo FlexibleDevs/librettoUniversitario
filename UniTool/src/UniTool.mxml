@@ -4,23 +4,86 @@
 							applicationDPI="160" creationComplete="tabbedviewnavigatorapplication1_creationCompleteHandler(event)" >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
+			
+			[Bindable]
+			private var _esami:Esami = new Esami();
+			
+			[Bindable]
+			private var arcLast:ArrayCollection;
+			[Bindable]
+			private var arcNext:ArrayCollection;
+			[Bindable]
+			private var strLast:String='';
+			[Bindable]
+			private var strNext:String='';
+			
+			[Bindable]
+			private var _user:User = new User();
 			
 			protected function tabbedviewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
 			{
-				var _user:User = new User();
+				//controllo se utente configurato o meno
+				
 				if(_user.status()){
-					//vskAll.selectedChild=cvsViste;
+					//Riepilogo ultimo esame
+					arcLast=new ArrayCollection(_esami.getLastExam());
+					if(arcLast.length > 0){
+						strLast="Ultimo esame sostenuto: "+arcLast.getItemAt(0).voe_desc+"\nIl giorno: "+arcLast.getItemAt(0).voe_data+"\nValutazione: "+arcLast.getItemAt(0).val_desc+"\nCrediti: "+arcLast.getItemAt(0).voe_cred;
+						callLast.open(this);
+					}
+					//Remenber prossimo esame
+					arcNext=new ArrayCollection(_esami.getNextExam());
+					if(arcNext.length > 0){
+						strNext="Prossimo esame in programma: "+arcNext.getItemAt(0).voe_desc+"\nIl giorno: "+arcNext.getItemAt(0).voe_data+"\nCrediti: "+arcNext.getItemAt(0).voe_cred+"\nGiorni mancanti: "+arcNext.getItemAt(0).giorni;
+						callNext.open(this);
+					}
 				}else{
-					//vskAll.selectedChild=cvsMenu;
+					
 				}
 			}
 			
 		]]>
 	</fx:Script>
-	
-	<fx:Declarations>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
 		
+		.calloutLast{
+			CornerRadius: 8;
+			frameThickness: 8;
+			arrowWidth: 82;
+			arrowHeight: 46;
+			borderThickness: 5;
+			frameThickness: 9;
+			contentCornerRadius: 40;
+			backgroundColor: #00FF00;
+		}
+		.calloutNext{
+			CornerRadius: 8;
+			frameThickness: 8;
+			arrowWidth: 82;
+			arrowHeight: 46;
+			borderThickness: 5;
+			frameThickness: 9;
+			contentCornerRadius: 40;
+			backgroundColor: #FF0000;
+		}
+	</fx:Style>
+	<fx:Declarations>
+		<s:Callout id="callLast" textAlign="center" styleName="calloutLast" >
+			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+				<s:Label fontSize="20" fontStyle="italic" fontWeight="bold" text="{strLast}" />
+				<s:Button label="Chiudi" click="callLast.close()" />
+			</s:VGroup>
+		</s:Callout>
+		<s:Callout id="callNext" textAlign="center" styleName="calloutNext" >
+			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+				<s:Label fontSize="20" fontStyle="italic" fontWeight="bold" text="{strNext}" />
+				<s:Button label="Chiudi" click="callNext.close()" />
+			</s:VGroup>
+		</s:Callout>
 	</fx:Declarations>
 	
 	<s:ViewNavigator id="viewEsami" label="Esami sostenuti" width="100%" height="100%" firstView="views.Lista" />

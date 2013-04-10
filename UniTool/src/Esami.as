@@ -49,7 +49,43 @@ package
 		}
 		
 		public function getValutazioni():Array{
-			stmt.text = "SELECT * from tabella_valutazioni";	
+			stmt.text = "SELECT * from tabella_valutazioni order by val_codi";	
+			stmt.execute();
+			
+			var result:Array = stmt.getResult().data;
+			return result;
+		}
+		
+		public function getLastExam():Array{
+			stmt.text = "SELECT  t.voe_codi,t.voe_desc,"+
+					"t.voe_cred,val.val_desc,t.val_codi,t.media,"+
+					"strftime('%d/%m/%Y',t.voe_data) as voe_data, " +
+					"strftime('%m/%d/%Y',t.voe_data) as voe_data2 " +
+					"from tabella_votiesami t "+
+					"left join tabella_valutazioni val "+
+					"on t.val_codi = val.val_codi " +
+					"where t.val_codi > 0 " +
+					"order by voe_data desc " +
+					"limit 1";	
+			stmt.execute();
+			
+			var result:Array = stmt.getResult().data;
+			return result;
+		}
+		
+		public function getNextExam():Array{
+			stmt.text = "SELECT  t.voe_codi,t.voe_desc,"+
+				"t.voe_cred,val.val_desc,t.val_codi,t.media,"+
+				"strftime('%d/%m/%Y',t.voe_data) as voe_data, " +
+				"strftime('%m/%d/%Y',t.voe_data) as voe_data2, " +
+				"julianday(voe_data)-julianday('now')  as giorni " +
+				"from tabella_votiesami t "+
+				"left join tabella_valutazioni val "+
+				"on t.val_codi = val.val_codi " +
+				"where t.val_codi = 0 " +
+				"and (julianday(voe_data)-julianday('now')) > 0 " +
+				"order by voe_data " +
+				"limit 1";	
 			stmt.execute();
 			
 			var result:Array = stmt.getResult().data;
