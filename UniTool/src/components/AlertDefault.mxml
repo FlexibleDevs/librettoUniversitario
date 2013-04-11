@@ -9,13 +9,26 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.managers.PopUpManager;
+			
+			import spark.components.View;
+			
+			import views.Lista;
+			
+			[Bindable]
+			private var _esami:Esami = new Esami();
 			
 			[Bindable]
 			private var _AlertText:String = "";
+			private var _Query:String = "";
+			public var _QueryExecuted:Boolean=false;
 			
-			public function SetAlertText(s:String):void {
+			private var stmt:SQLStatement;
+			
+			public function SetAlertText(s:String,query:String):void {
 				_AlertText = s;
+				_Query = query;
 			}
 			
 			public function ViewButtons(i:int):void {
@@ -29,6 +42,15 @@
 					btnOk.includeInLayout = true;
 					btnCancel.visible = true;
 					btnCancel.includeInLayout = true;
+				}else if(i == 3) {
+					btnOk.visible = false;
+					btnOk.includeInLayout = false;
+					btnCancel.visible = false;
+					btnCancel.includeInLayout = false;
+					btnSi.visible = true;
+					btnSi.includeInLayout = true;
+					btnNo.visible = true;
+					btnNo.includeInLayout = true;
 				}
 			}
 			
@@ -45,10 +67,28 @@
 			
 			protected function titlewindow1_addedToStageHandler(event:Event):void
 			{
+				//Inizializzo variabili SQL
+				stmt = new SQLStatement();
+				stmt.sqlConnection = new SQLConnection();
+				stmt.sqlConnection.open(File.applicationDirectory.resolvePath("db/Libretto.s3db"));
+				
 				// TODO Auto-generated method stub
 				if(this.closeButton != null){
 					this.closeButton.visible = false;
 				}
+			}
+			
+			protected function btnSi_clickHandler(event:MouseEvent):void
+			{
+				if(_Query.length > 0){
+					stmt.text = _Query;
+					stmt.execute();
+				}
+				PopUpManager.removePopUp(this);	
+				var _rows:Number=stmt.getResult().rowsAffected;
+				_QueryExecuted=(_rows > 0) ? true : false;
+				
+				this.parentApplication.viewEsami.activeView.arcEsami=new ArrayCollection(_esami.getEsami(0));
 			}
 			
 		]]>
@@ -61,5 +101,9 @@
 				  click="processLogin();" /> 
 		<s:Button id="btnCancel" label="Cancel"
 				  click="handleCloseEvent();"/> 
+		<s:Button id="btnSi" label="Si" visible="false"
+				  click="btnSi_clickHandler(event)" /> 
+		<s:Button id="btnNo" label="No" visible="false"
+				  click="processLogin();"/> 
 	</s:HGroup> 
 </s:TitleWindow>

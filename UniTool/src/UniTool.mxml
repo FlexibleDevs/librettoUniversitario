@@ -25,19 +25,21 @@
 			protected function tabbedviewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
 			{
 				//controllo se utente configurato o meno
-				
 				if(_user.status()){
+					
+					//DA VERIFICARE INSIEME SE POSSONO ESSERE UTILI O MENO
+					
 					//Riepilogo ultimo esame
 					arcLast=new ArrayCollection(_esami.getLastExam());
 					if(arcLast.length > 0){
 						strLast="Ultimo esame sostenuto: "+arcLast.getItemAt(0).voe_desc+"\nIl giorno: "+arcLast.getItemAt(0).voe_data+"\nValutazione: "+arcLast.getItemAt(0).val_desc+"\nCrediti: "+arcLast.getItemAt(0).voe_cred;
-						callLast.open(this);
+						//callLast.open(this);
 					}
 					//Remenber prossimo esame
 					arcNext=new ArrayCollection(_esami.getNextExam());
 					if(arcNext.length > 0){
 						strNext="Prossimo esame in programma: "+arcNext.getItemAt(0).voe_desc+"\nIl giorno: "+arcNext.getItemAt(0).voe_data+"\nCrediti: "+arcNext.getItemAt(0).voe_cred+"\nGiorni mancanti: "+arcNext.getItemAt(0).giorni;
-						callNext.open(this);
+						//callNext.open(this);
 					}
 				}else{
 					
@@ -86,9 +88,9 @@
 		</s:Callout>
 	</fx:Declarations>
 	
-	<s:ViewNavigator id="viewEsami" label="Esami sostenuti" width="100%" height="100%" firstView="views.Lista" />
-	<s:ViewNavigator id="viewAgenda" label="Agenda" width="100%" height="100%" firstView="views.Agenda" />
-	<s:ViewNavigator id="viewStat" label="Statistiche" width="100%" height="100%" firstView="views.Stat" />
 	<s:ViewNavigator id="viewProfilo" label="Profilo" width="100%" height="100%" firstView="views.Profilo" />
+	<s:ViewNavigator id="viewEsami" label="Gestione Esami" width="100%" height="100%" firstView="views.Lista" />
+	<s:ViewNavigator id="viewAgenda" label="Agenda" width="100%" height="100%" firstView="views.Agenda" />
+	<s:ViewNavigator id="viewStat" label="Andamento" width="100%" height="100%" firstView="views.Stat" />
 	
 </s:TabbedViewNavigatorApplication>

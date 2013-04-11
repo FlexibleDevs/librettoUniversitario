@@ -6,13 +6,13 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.charts.HitData;
-			import mx.charts.series.items.LineSeriesItem;
-			import mx.events.CloseEvent;
+			import mx.charts.series.items.AreaSeriesItem;
+			import mx.collections.ArrayCollection;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
 			import mx.formatters.DateFormatter;
-			import mx.formatters.Formatter;
-			import mx.managers.CursorManager;
-			[Bindable]
-			private var strUrl:String="gosetto.altervista.org/flex/Uni";
+			import mx.graphics.Stroke;
+			import mx.utils.ArrayUtil;
 			
 			[Bindable]
 			private var intUsr_codi:int;
@@ -23,110 +23,82 @@
 			private var _user:User = new User();
 			
 			[Bindable]
+			private var _stat:Statistiche = new Statistiche();
+			[Bindable]
+			private var arcAndamento:ArrayCollection;
+			
+			[Bindable]
 			private var dttApp:DateFormatter = new DateFormatter();
 			[Bindable]
 			private var dttApp02:DateFormatter = new DateFormatter();
+			
+			[Bindable]
+			private var blnDataTips:Boolean=false; 
 			
 			private function Stat_creationComplete(e:Event):void{
 				dttApp.formatString='DD/MM/YYYY';
 				dttApp02.formatString='YYYY-MM-DD';
 				
-				//prendo codice utente da file config
-				//userRequest10.send();
+				strTitle="Andamento - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
 				
-				strTitle="Statistiche - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+				arcAndamento=new ArrayCollection(_stat.getAndamento());
+				rbtnNoMedia.selected=true;
 			}
 			
 			private function lch01_dataTipFunction(hd:HitData):String {
 				var strLabel:String;	
-				strLabel='Esame sostenuto il giorno ' + hd.item.data + ' con il voto di ' + LineSeriesItem(hd.chartItem).yValue.toString();
+				strLabel='Esame sostenuto il giorno <b>' + hd.item.data + '</b> con il voto di <b>' + hd.item.val_desc + "</b>";//AreaSeriesItem(hd.chartItem).yValue.toString();
 				return strLabel;
 			}
 			
-			private function userRequest10_result(e:Event):void{
-				intUsr_codi=userRequest10.lastResult.config.utente as int;
-				//strUrl=userRequest10.lastResult.config.server;
-				
-				//medie - crediti
-				userRequest09.send();
-				//line chart
-				userRequest07.send();
-				//voti
-				userRequest06.send();
+			protected function rbtnSiMedia_clickHandler(event:MouseEvent):void
+			{
+				if(rbtnSiMedia.selected){
+					blnDataTips=true;
+				}else{
+					blnDataTips=false;
+				}
 			}
+			
+			protected function rbtnNoMedia_clickHandler(event:MouseEvent):void
+			{
+				if(rbtnNoMedia.selected){
+					blnDataTips=false;
+				}else{
+					blnDataTips=true;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
-		<mx:HTTPService id="userRequest06" url="http://{strUrl}/get_voti02.php" useProxy="false" method="POST" >
-			<mx:request xmlns="">
-				<user>{intUsr_codi}</user>
-			</mx:request>
-		</mx:HTTPService>
-		<mx:HTTPService id="userRequest07" url="http://{strUrl}/get_graf.php" useProxy="false" method="POST" >
-			<mx:request xmlns="">
-				<user>{intUsr_codi}</user>
-			</mx:request>
-		</mx:HTTPService>
-		<mx:HTTPService id="userRequest09" url="http://{strUrl}/get_medie.php" useProxy="false" method="POST" >
-			<mx:request xmlns="">
-				<user>{intUsr_codi}</user>
-			</mx:request>
-		</mx:HTTPService>
-		<mx:HTTPService id="userRequest10" url="config/config.xml" useProxy="false" method="POST" result="userRequest10_result(event)" />
-		
 		<mx:NumberFormatter precision="2" id="formatter" />
 		
 		<mx:SeriesSlide id="slideIn" duration="1000" direction="down"/>
 		<mx:SeriesSlide id="slideOut" duration="1000" direction="up"/>
+		
+		<s:RadioButtonGroup id="radioIncludiMedia"/>
 	</fx:Declarations>
-	<!--<mx:Canvas top="209" right="10" bottom="61" width="475">
-		<controls:DegrafaGauge id="gauge" liveDragging="false" styleName="gauge" valueScale="Log"
-							   startAngle="45"  minimum="18" maximum="32" value="{userRequest09.lastResult.users.user.Ponderata}"
-							   endAngle="315" diameter="350"
-							   labelStyleName="gaugeLabel" labelFormatter="{formatter}" showEffect="{slideIn}"/>
-	</mx:Canvas>-->
-	<mx:LineChart id="lch01" top="209" bottom="61" left="10" right="10" showDataTips="true" dataProvider="{userRequest07.lastResult.users.user}"
-				  dataTipFunction="lch01_dataTipFunction" >
+	<mx:AreaChart id="lch01" top="0" bottom="50" left="0" right="0" showDataTips="true" dataProvider="{arcAndamento}" dataTipFunction="lch01_dataTipFunction" showAllDataTips="{blnDataTips}">
 		<mx:horizontalAxis>
-			<mx:CategoryAxis dataProvider="{userRequest07.lastResult.users.user}" categoryField="data" />
+			<mx:CategoryAxis title="Andamento Cronologico" dataProvider="{arcAndamento}" categoryField="data" />
 		</mx:horizontalAxis>
+		<mx:verticalAxis>
+			<mx:LinearAxis interval="1" title="Valutazioni" baseAtZero="false" />  
+		</mx:verticalAxis>
 		<mx:series>
-			<mx:LineSeries displayName="data" yField="Numero" >
+			<mx:AreaSeries displayName="data" yField="Numero" areaStroke="{new Stroke(0xFF0000, 5, 0.4)}" >
 				<mx:showDataEffect>
 					<mx:SeriesInterpolate duration="1000" />
 				</mx:showDataEffect>
-			</mx:LineSeries>
+			</mx:AreaSeries>
+			<!--<mx:LineSeries yField="Numero" lineStroke="{new Stroke(0x0066FF, 5, 0.4)}" />-->
 		</mx:series>
-	</mx:LineChart>
-	<!-- <mx:DataGrid id="grdVoti" left="10" bottom="5" right="10" dataProvider="{userRequest06.lastResult.users.user}" height="48">
-		<mx:columns>
-			<mx:DataGridColumn headerText="18" dataField="a"/>
-			<mx:DataGridColumn headerText="19" dataField="b"/>
-			<mx:DataGridColumn headerText="20" dataField="c"/>
-			<mx:DataGridColumn headerText="21" dataField="d"/>
-			<mx:DataGridColumn headerText="22" dataField="e"/>
-			<mx:DataGridColumn headerText="23" dataField="f"/>
-			<mx:DataGridColumn headerText="24" dataField="g"/>
-			<mx:DataGridColumn headerText="25" dataField="h"/>
-			<mx:DataGridColumn headerText="26" dataField="i"/>
-			<mx:DataGridColumn headerText="27" dataField="l"/>
-			<mx:DataGridColumn headerText="28" dataField="m"/>
-			<mx:DataGridColumn headerText="29" dataField="n"/>
-			<mx:DataGridColumn headerText="30" dataField="o"/>
-			<mx:DataGridColumn headerText="30 e lode" dataField="p"/>
-		</mx:columns>
-	</mx:DataGrid>
-	<mx:HBox left="10" right="10" top="10" height="191">
-		<mx:Canvas  height="100%" width="70%" borderStyle="solid" cornerRadius="5" borderColor="#AAFF33" horizontalScrollPolicy="off" >
-			<mx:Label y="10" text="Medie" textAlign="center" height="50" fontSize="20" fontStyle="italic" fontWeight="bold" textDecoration="underline" width="478" horizontalCenter="0"/>
-			<mx:Label y="68" text="Artimetica" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" textDecoration="underline" left="20"/>
-			<mx:Label y="120" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" left="30" text="{formatter.format(userRequest09.lastResult.users.user.Artimetica).toString()}"/>
-			<mx:Label y="68" text="Ponderata" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" textDecoration="underline" right="20"/>
-			<mx:Label y="120" text="{formatter.format(userRequest09.lastResult.users.user.Ponderata).toString()}" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" right="30"/>
-		</mx:Canvas>
-		<mx:Canvas  height="100%" width="30%" borderStyle="solid" cornerRadius="5" borderColor="#FF0000">
-			<mx:Label y="10" text="Crediti" textAlign="center" height="44" fontSize="20" fontStyle="italic" fontWeight="bold" textDecoration="underline" horizontalCenter="0"/>
-			<mx:Label y="62" text="{(userRequest09.lastResult.users.user.Crediti as int).toString()}" textAlign="center" height="90" fontSize="20" fontStyle="italic" fontWeight="bold" color="#FF0000" width="100%"/>
-		</mx:Canvas>
-	</mx:HBox> -->
+	</mx:AreaChart>
+	<s:Label left="10" bottom="2" width="144" height="50" color="#000000" fontSize="16" text="Visualizza dettagli" verticalAlign="middle"/>
+	<s:HGroup left="150" bottom="10" width="187" height="32" gap="40" horizontalAlign="left"
+			  verticalAlign="middle">
+		<s:RadioButton id="rbtnSiMedia" label="Si" groupName="radioIncludiMedia" click="rbtnSiMedia_clickHandler(event)"/>
+		<s:RadioButton id="rbtnNoMedia" label="No" groupName="radioIncludiMedia" click="rbtnNoMedia_clickHandler(event)"/>
+	</s:HGroup>
 </s:View>
