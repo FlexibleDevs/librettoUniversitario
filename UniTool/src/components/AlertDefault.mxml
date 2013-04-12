@@ -37,11 +37,19 @@
 					btnOk.includeInLayout = true;
 					btnCancel.visible = false;
 					btnCancel.includeInLayout = false;
+					btnSi.visible = false;
+					btnSi.includeInLayout = false;
+					btnNo.visible = false;
+					btnNo.includeInLayout = false;
 				} else if(i == 2) {
 					btnOk.visible = true;
 					btnOk.includeInLayout = true;
 					btnCancel.visible = true;
 					btnCancel.includeInLayout = true;
+					btnSi.visible = false;
+					btnSi.includeInLayout = false;
+					btnNo.visible = false;
+					btnNo.includeInLayout = false;
 				}else if(i == 3) {
 					btnOk.visible = false;
 					btnOk.includeInLayout = false;

@@ -91,5 +91,15 @@ package
 			var result:Array = stmt.getResult().data;
 			return result;
 		}
+		
+		public function getExamDate():Array{
+			stmt.text = "SELECT strftime('%d/%m/%Y',min(t.voe_data)) as Minima, " +
+				"strftime('%m/%d/%Y',max(t.voe_data)) as Massima " +
+				"from tabella_votiesami t ";	
+			stmt.execute();
+			
+			var result:Array = stmt.getResult().data;
+			return result;
+		}
 	}
 }

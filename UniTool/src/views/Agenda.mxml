@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="Agenda">
+		xmlns:s="library://ns.adobe.com/flex/spark" title="{strTitle}" creationComplete="Agenda_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
+			[Bindable]
+			private var strTitle:String;
+			[Bindable]
+			private var _user:User = new User();
+			
+			[Bindable]
+			private var _esami:Esami = new Esami();
+			
+			protected function Agenda_creationCompleteHandler(event:FlexEvent):void
+			{
+				strTitle="Agenda Esami - "+_user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+			}
+			
+			protected function dtsEsami_clickHandler(event:MouseEvent):void
+			{
+				
+			}
+			
+		]]>
+	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<s:HGroup width="30%" height="100%" verticalAlign="middle">
+		<s:DateSpinner width="100%" height="100%" id="dtsEsami" locale="it" displayMode="{DateSelectorDisplayMode.DATE_AND_TIME}" click="dtsEsami_clickHandler(event)" />         
+	</s:HGroup>
 </s:View>
