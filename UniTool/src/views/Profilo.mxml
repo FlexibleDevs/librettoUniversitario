@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="{strTitle}" creationComplete="User_creationCompleteHandler(event)">
-	<s:layout>
-		<s:VerticalLayout/>
-	</s:layout>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		creationComplete="User_creationCompleteHandler(event)" title="{strTitle}" viewActivate="User_viewActivateHandler(event)">
+	
 	<fx:Script>
 		<![CDATA[
 			import flash.net.navigateToURL;
 			
 			import mx.events.FlexEvent;
 			
+			import spark.events.ViewNavigatorEvent;
 			import spark.globalization.StringTools;
 			
 			[Bindable]
@@ -18,13 +18,61 @@
 			[Bindable]
 			private var _user:User = new User();
 			
+			private var _myCam:CameraUI;
+			//variabile appoggio per la gestione file immagine card acquisita
+			private var _dataSource:IDataInput;
+			
+			private var _mediaPromise:MediaPromise;
+
+			
 			[Bindable]
 			private var arrUserApp:Array = new Array();
 			
 			protected function User_creationCompleteHandler(event:FlexEvent):void
 			{
+				ControlloUtente();
 				PopoloInfo();
 				txtusr_nome.setFocus();
+			}
+			
+			private function CatturaFoto(e:Event):void {
+				_myCam.launch(MediaType.IMAGE);
+			}
+			
+			//inizializzo la gestione camera dell'ipad al caricamento del modulo
+			private function User_viewActivateHandler(e:ViewNavigatorEvent):void
+			{
+				if (CameraUI.isSupported){
+					_myCam = new CameraUI();
+					_myCam.addEventListener(MediaEvent.COMPLETE, onCameraComplete);
+				}
+			}			
+			
+			//definisco l'evento di completamento acquisizione immagine da camera
+			private function onCameraComplete(e:MediaEvent):void
+			{
+				var cameraUI:CameraUI = e.target as CameraUI;
+				_mediaPromise = e.data;
+				
+				var mpLoader:Loader = new Loader();
+				mpLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onMediaLoaded);
+				mpLoader.loadFilePromise(_mediaPromise);
+			}
+			
+			private function onMediaLoaded(e:Event):void
+			{
+				var mpLoaderInfo:LoaderInfo = e.target as LoaderInfo;
+				mpLoaderInfo.removeEventListener(Event.COMPLETE, onMediaLoaded);
+				imgProfilo.source = mpLoaderInfo.loader;
+			}
+			
+			private function ControlloUtente():void {
+				var currentUser:Array = _user.getinfo();
+				if(currentUser[0]['usr_conf'] == 0){
+					
+				} else {
+					
+				}
 			}
 			
 			protected function UpdateUser():void
@@ -72,21 +120,43 @@
 			
 		]]>
 	</fx:Script>
+	<s:states>
+		<s:State name="Profilo"/>
+		<s:State name="ConfProfilo"/>
+	</s:states>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<s:VGroup width.Profilo="598" height.Profilo="355">
+		
 	
-	<s:TextInput id="txtusr_nome" y="64" width="100%" height="50" fontSize="20" maxChars="100" prompt="Nome" tabIndex="1" />
-	<s:TextInput id="txtusr_cogn" width="100%" height="50" fontSize="20" maxChars="100" prompt="Cognome" tabIndex="2" />
-	<s:TextInput id="txtusr_faco" width="100%" height="50" fontSize="20" maxChars="100" prompt="Facoltà" tabIndex="3" />
-	<s:HGroup width="100%">
-		<s:TextInput id="txtusr_link" width="100%" height="50" fontSize="20" maxChars="100" prompt="Link facoltà" tabIndex="4" />
-		<s:Image width="50" height="50" source="image/arrow1.png" click="link_clickHandler(event)" useHandCursor="true" buttonMode="true" tabEnabled="false"/>
+	<s:TextInput id="txtusr_nome" y="64" width="100%" height="50" fontSize="20" maxChars="100"
+				 prompt="Nome" tabIndex="1"
+				 width.Profilo="100%"/>
+	<s:TextInput id="txtusr_cogn" width="100%" height="50" fontSize="20" maxChars="100"
+				 prompt="Cognome" tabIndex="2"
+				 width.Profilo="100%"/>
+	<s:TextInput id="txtusr_faco" width="100%" height="50" fontSize="20" maxChars="100"
+				 prompt="Facoltà" tabIndex="3"
+				 width.Profilo="100%"/>
+	<s:HGroup width="100%"
+			  width.Profilo="598">
+		<s:TextInput id="txtusr_link" width="100%" height="50" fontSize="20" maxChars="100"
+					 prompt="Link facoltà" tabIndex="4"
+					 width.Profilo="537"/>
+		<s:Image width="50" height="50" buttonMode="true" click="link_clickHandler(event)"
+				 source="image/arrow1.png" tabEnabled="false" useHandCursor="true"/>
 	</s:HGroup>
-	<s:HGroup width="100%" bottom="10" horizontalAlign="center" tabEnabled="false">
-		<s:Button label="Aggiorna" click="UpdateUser()" fontSize="20" />
+	<s:HGroup bottom="10" width="100%" horizontalAlign="center" tabEnabled="false">
+		<s:Button label="Aggiorna" click="UpdateUser()" fontSize="20"/>
 	</s:HGroup>
-	<s:HGroup width="100%" bottom="10" horizontalAlign="center" tabEnabled="false">
+	<s:HGroup bottom="10" width="100%" horizontalAlign="center" tabEnabled="false">
 		<s:Label id="lblUpdate" height="50" fontSize="17"/>
 	</s:HGroup>
+	</s:VGroup>
+	<s:Image id="imgProfilo" x="488" y="10" width="184" height="159" scaleMode="letterbox"
+			 smooth="true"
+			 x.Profilo="606" y.Profilo="0"/>
+	<s:Button x="488" y="177" width="184" label="Scatta" click="CatturaFoto(event)"
+			  x.Profilo="606" y.Profilo="167"/>
 </s:View>
