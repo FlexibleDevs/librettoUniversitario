@@ -52,7 +52,7 @@
 			private function onCameraComplete(e:MediaEvent):void
 			{
 				var cameraUI:CameraUI = e.target as CameraUI;
-				_mediaPromise = e.data;
+				_mediaPromise = e.data; // contiene riferimento all'immagine con nativepath
 				
 				var mpLoader:Loader = new Loader();
 				mpLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onMediaLoaded);
