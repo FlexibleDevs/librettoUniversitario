@@ -40,6 +40,38 @@ package
 			return result;
 		}
 		
+		public function getPieExam():Array{
+			stmt.text = "select count(0) as Numero,"+
+						          "'Fatti' as Label "+
+						"from tabella_votiesami "+
+						"where val_codi > 0 "+
+						"union all " +
+						"select count(0) as Numero, "+
+						          "'DaFare' as Label "+
+						"from tabella_votiesami "+
+						"where val_codi = 0";
+			stmt.execute();
+			
+			var result:Array = stmt.getResult().data;
+			return result;
+		}
+		
+		public function getMedie():Array{
+			stmt.text = "SELECT sum(v.val_valo)/(count(0)) as Artimetica, "+
+							"sum(v.val_valo*t.voe_cred)/(sum(t.voe_cred)) as Ponderata, "+
+							"(select sum(voe_cred) from tabella_votiesami) as Crediti "+
+				"from tabella_votiesami t "+
+				"left join tabella_valutazioni v "+
+				"on t.val_codi = v.val_codi "+
+				"where media = 1";
+			stmt.execute();
+			
+			var result:Array = stmt.getResult().data;
+			return result;
+		}
+		
+		
+		
 		
 	}
 }

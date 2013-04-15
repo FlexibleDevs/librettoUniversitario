@@ -72,6 +72,27 @@
 			contentCornerRadius: 40;
 			backgroundColor: #FF0000;
 		}
+		s|ActionBar
+		{
+			/*chromeColor: #229988;*/
+			titleAlign: center;
+		}
+		
+		s|ActionBar #titleDisplay
+		{
+			color: #CCCCCC;
+			fontSize: 40;
+			fontFamily: "Comic Sans MS";
+		}
+		
+		s|TabbedViewNavigator #tabBar
+		{
+			/*chromeColor: #229988;*/
+			color: #CCCCCC;
+			fontFamily: "Comic Sans MS";
+			iconPlacement:top;
+			textDecoration:underline;
+		}
 	</fx:Style>
 	<fx:Declarations>
 		<s:Callout id="callLast" textAlign="center" styleName="calloutLast" >
@@ -88,9 +109,9 @@
 		</s:Callout>
 	</fx:Declarations>
 	
-	<s:ViewNavigator id="viewProfilo" label="Profilo" width="100%" height="100%" firstView="views.Profilo" />
-	<s:ViewNavigator id="viewEsami" label="Gestione Esami" width="100%" height="100%" firstView="views.Lista" />
-	<s:ViewNavigator id="viewAgenda" label="Agenda" width="100%" height="100%" firstView="views.Agenda" />
-	<s:ViewNavigator id="viewStat" label="Andamento" width="100%" height="100%" firstView="views.Stat" />
+	<s:ViewNavigator textAlign="center" id="viewProfilo" label="Profilo" width="100%" height="100%" firstView="views.Profilo" icon="@Embed('image/user.png')" />
+	<s:ViewNavigator textAlign="center" id="viewEsami" label="Gestione Esami" width="100%" height="100%" firstView="views.Lista" icon="@Embed('image/book.png')" />
+	<s:ViewNavigator textAlign="center" id="viewAgenda" label="Agenda Esami" width="100%" height="100%" firstView="views.Agenda" icon="@Embed('image/calendar.png')" />
+	<s:ViewNavigator textAlign="center" id="viewStat" label="Andamento" width="100%" height="100%" firstView="views.Stat" icon="@Embed('image/line.png')" />
 	
 </s:TabbedViewNavigatorApplication>
