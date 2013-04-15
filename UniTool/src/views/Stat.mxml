@@ -44,7 +44,7 @@
 			
 			private function lch01_dataTipFunction(hd:HitData):String {
 				var strLabel:String;	
-				strLabel='Esame sostenuto il giorno <b>' + hd.item.data + '</b> con il voto di <b>' + hd.item.val_desc + "</b>";//AreaSeriesItem(hd.chartItem).yValue.toString();
+				strLabel='Esame sostenuto il giorno <b>' + hd.item.data + '</b><br>con il voto di <b>' + hd.item.val_desc + "</b>";//AreaSeriesItem(hd.chartItem).yValue.toString();
 				return strLabel;
 			}
 			
