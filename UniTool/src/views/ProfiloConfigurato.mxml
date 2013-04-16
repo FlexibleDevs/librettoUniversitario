@@ -1,28 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="ProfiloConfigurato" viewActivate="profilo_creationCompleteHandler(event)">
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:aaronhardy="com.aaronhardy.*"
+		title="{strTitle}" viewActivate="profilo_creationCompleteHandler(event)">
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
+			
+			import mx.charts.HitData;
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			[Bindable]
 			private var _user:User = new User();
+			[Bindable]
+			private var _statistiche:Statistiche = new Statistiche();
+			
+			[Bindable]
+			private var strTitle:String;
+			
+			[Bindable]
+			private var arrUserApp:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var arrPieApp:Array = new Array();
+			[Bindable]
+			private var arrStatApp:ArrayCollection = new ArrayCollection();
 			
 			protected function profilo_creationCompleteHandler(event:Event):void
 			{
-				lblUtente.text = _user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+				PopoloInfo();
 			}
 			
 			private function imgProfilo_ioError(e:IOErrorEvent):void {
 				imgProfilo.source = null;
 			}
 			
+			protected function PopoloInfo():void{
+				arrUserApp=new ArrayCollection(_user.getinfo());
+				strTitle="Profilo - "+arrUserApp[0].usr_nome + " " + arrUserApp[0].usr_cogn;
+				
+				//Piechart
+				arrPieApp=_statistiche.getPieExam();
+				//Statistiche
+				arrStatApp=new ArrayCollection(_statistiche.getMedie());
+				
+				imgProfilo.source = arrUserApp[0].usr_imag != null ? arrUserApp[0].usr_imag : '';
+				
+			}
+			
+			private function piechart1_dataTipFunction(hd:HitData):String {
+				var strLabel:String;	
+				strLabel='<center>' + hd.item.Label + ' ( <b>' + hd.item.Numero + '</b> )</center>';
+				return strLabel;
+			}
+			
+			protected function edit_clickHandler(event:MouseEvent):void
+			{
+				if(_user.callquery("update tabella_utenti set edit = 1",null)){
+					navigator.popView();
+				}
+			}
+			
+			protected function falcolta_clickHandler(event:MouseEvent):void
+			{
+				if(arrUserApp[0].usr_link != null && arrUserApp[0].usr_link != ''){
+					navigateToURL(new URLRequest(arrUserApp[0].usr_link as String),"_blank");
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+
 	</fx:Declarations>
+	<s:navigationContent>
+		<s:Button label="Modifica" click="edit_clickHandler(event)"/>
+	</s:navigationContent>
 	<s:Image id="imgProfilo" left="0" top="0" width="50%" height="190"
 			 ioError="imgProfilo_ioError(event)" scaleMode="letterbox" smooth="true"/>
-	<s:Label id="lblUtente" x="0" y="198" width="240" height="20" fontStyle="italic"
-			 verticalAlign="middle"/>
+	<mx:PieChart id="piechart1" right="1" top="0" width="50%" height="190" dataProvider="{arrPieApp}"
+				 showAllDataTips="true" dataTipFunction="piechart1_dataTipFunction">
+		<mx:series>
+			<mx:PieSeries displayName="Label" field="Numero" dataProvider="{arrPieApp}" explodeRadius=".12">
+				<mx:showDataEffect>
+					<mx:SeriesInterpolate duration="1000" />
+				</mx:showDataEffect>
+			</mx:PieSeries>
+		</mx:series>
+	</mx:PieChart>
+	<s:Label y="198" left="10" right="10" fontSize="25" fontStyle="italic" useHandCursor="true" buttonMode="true" fontWeight="bold" text="{arrUserApp.getItemAt(0).usr_faco}" 
+			 color="#FF0000" click="falcolta_clickHandler(event)" toolTip="{arrUserApp.getItemAt(0).usr_link}" />
+	<s:Label x="10" y="230" fontSize="25" fontStyle="italic" text="Media artimetica/ponderata:"/>
+	<s:Label x="10" y="262" fontSize="25" fontStyle="italic" text="Base per laurea:"/>
+	<s:Label x="10" y="294" fontSize="25" fontStyle="italic" text="Crediti"/>
+	<s:Label x="335" y="230" fontSize="25" fontStyle="italic" fontWeight="bold" text="{arrStatApp.getItemAt(0).Aritmetica} / {arrStatApp.getItemAt(0).Ponderata}"/>
+	<s:Label x="334" y="266" fontSize="25" fontStyle="italic" fontWeight="bold" text="{arrStatApp.getItemAt(0).Base}"/>
+	<aaronhardy:ProgressBar id="progressBar" skinClass="com.aaronhardy.ProgressBarSkin" y="298" left="335" right="10" maximum="180" minimum="0" value="{arrStatApp.getItemAt(0).Crediti}"/>
 </s:View>

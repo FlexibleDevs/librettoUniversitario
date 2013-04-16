@@ -23,7 +23,7 @@ package
 		 **/
 		public function status():Boolean{
 			
-			stmt.text = "SELECT * FROM tabella_utenti where usr_conf = 1";	
+			stmt.text = "SELECT * FROM tabella_utenti where usr_conf = 1 and edit = 0";	
 			stmt.execute();
 			
 			var result:Array = stmt.getResult().data;

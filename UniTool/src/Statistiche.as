@@ -42,12 +42,12 @@ package
 		
 		public function getPieExam():Array{
 			stmt.text = "select count(0) as Numero,"+
-						          "'Fatti' as Label "+
+						          "'Sostenuti' as Label "+
 						"from tabella_votiesami "+
 						"where val_codi > 0 "+
 						"union all " +
 						"select count(0) as Numero, "+
-						          "'DaFare' as Label "+
+						          "'Da sostenere' as Label "+
 						"from tabella_votiesami "+
 						"where val_codi = 0";
 			stmt.execute();
@@ -57,12 +57,14 @@ package
 		}
 		
 		public function getMedie():Array{
-			stmt.text = "SELECT sum(v.val_valo)/(count(0)) as Artimetica, "+
-							"sum(v.val_valo*t.voe_cred)/(sum(t.voe_cred)) as Ponderata, "+
-							"(select sum(voe_cred) from tabella_votiesami) as Crediti "+
-				"from tabella_votiesami t "+
-				"left join tabella_valutazioni v "+
-				"on t.val_codi = v.val_codi "+
+			stmt.text = "SELECT sum(v.val_valo)*1.00/(count(0)) as Aritmetica, " +
+							"count(0) as Esami, " +
+							"sum(v.val_valo*t.voe_cred)*1.00/(sum(t.voe_cred)) as Ponderata, " +
+							"(select sum(voe_cred) from tabella_votiesami) as Crediti, " +
+							"sum(v.val_valo*t.voe_cred)/(sum(t.voe_cred))*110/30 as Base " +
+				"from tabella_votiesami t " +
+				"left join tabella_valutazioni v " +
+				"on t.val_codi = v.val_codi " +
 				"where media = 1";
 			stmt.execute();
 			

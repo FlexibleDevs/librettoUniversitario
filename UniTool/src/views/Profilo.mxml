@@ -11,6 +11,7 @@
 			
 			import spark.events.ViewNavigatorEvent;
 			import spark.globalization.StringTools;
+			import spark.transitions.ViewTransitionBase;
 			
 			[Bindable]
 			private var strTitle:String;
@@ -31,8 +32,15 @@
 			
 			protected function User_creationCompleteHandler(event:FlexEvent):void
 			{
-				PopoloInfo();
-				txtusr_nome.setFocus();
+				var transation:ViewTransitionBase = new ViewTransitionBase();
+				transation.duration=0;
+				
+				if(_user.status()){
+					navigator.pushView(views.ProfiloConfigurato,null,null,transation);
+				}else{
+					PopoloInfo();
+					txtusr_nome.setFocus();
+				}
 			}
 			
 			private function CatturaFoto(e:Event):void {
@@ -80,6 +88,13 @@
 						PopoloInfo();
 						lblUpdate.setStyle("color","#33FF33");
 						lblUpdate.text="Aggiornamento Completato !";
+						
+						if(_user.callquery("update tabella_utenti set edit = 0",null)){
+							var transation:ViewTransitionBase = new ViewTransitionBase();
+							transation.duration=0;
+							navigator.pushView(views.ProfiloConfigurato,null,null,transation);
+						}
+						
 					}else{
 						lblUpdate.setStyle("color","#FF0000");
 						lblUpdate.text="Errore nell'Aggiornamento dell'Utente !";
@@ -122,7 +137,7 @@
 		<s:State name="ConfProfilo"/>
 	</s:states>
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Fade id="myViewTransition" duration="0" />
 	</fx:Declarations>
 	<s:VGroup left.Profilo="0" right.Profilo="202" top.Profilo="0" bottom.Profilo="1">
 		

@@ -6,8 +6,10 @@
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.core.IVisualElement;
+			import mx.core.mx_internal;
 			import mx.events.FlexEvent;
 			
+			import spark.components.ActionBar;
 			import spark.components.TabbedViewNavigator;
 			import spark.components.View;
 			
@@ -25,23 +27,20 @@
 			private var strLast:String='';
 			[Bindable]
 			private var strNext:String='';
-			[Bindable]
-			private var blnUserConf:Boolean=false;
 			
 			[Bindable]
 			private var _user:User = new User();
 			
 			protected function tabbedviewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
 			{
-				blnUserConf=_user.status();
+				//Controllo il flag EDIT
+				if(_user.getinfo()[0].edit == 1 && String(_user.getinfo()[0].usr_nome).length > 0 && String(_user.getinfo()[0].usr_cogn).length > 0){
+					_user.callquery("update tabella_utenti set edit = 0",null)
+				}
 				//controllo se utente configurato o meno (primo accesso)
-				if(blnUserConf){
-					this.removeElement(viewProfilo);
-					viewEsami.enabled=true;
-					viewAgenda.enabled=true;
-					viewStat.enabled=true;
-
+				if(_user.status()){
 					//DA VERIFICARE INSIEME SE POSSONO ESSERE UTILI O MENO
+					/*
 					//Riepilogo ultimo esame
 					arcLast=new ArrayCollection(_esami.getLastExam());
 					if(arcLast.length > 0){
@@ -54,8 +53,11 @@
 						strNext="Prossimo esame in programma: "+arcNext.getItemAt(0).voe_desc+"\nIl giorno: "+arcNext.getItemAt(0).voe_data+"\nCrediti: "+arcNext.getItemAt(0).voe_cred+"\nGiorni mancanti: "+arcNext.getItemAt(0).giorni;
 						//callNext.open(this);
 					}
+					*/
+					viewEsami.enabled=true;
+					viewAgenda.enabled=true;
+					viewStat.enabled=true;
 				}else{
-					this.removeElement(viewProfiloConf);
 					viewEsami.enabled=false;
 					viewAgenda.enabled=false;
 					viewStat.enabled=false;
@@ -90,8 +92,8 @@
 		}
 		s|ActionBar
 		{
-			/*chromeColor: #229988;*/
-			titleAlign: center;
+			/*chromeColor: #229988;
+			titleAlign: center;*/
 		}
 		
 		s|ActionBar #titleDisplay
@@ -124,9 +126,8 @@
 			</s:VGroup>
 		</s:Callout>
 	</fx:Declarations>
-	 
+
 	<s:ViewNavigator textAlign="center" id="viewProfilo" label="Profilo" width="100%" firstView="views.Profilo" height="100%" icon="@Embed('image/user.png')" />
-	<s:ViewNavigator textAlign="center" id="viewProfiloConf" label="Profilo" width="100%" firstView="views.ProfiloConfigurato" height="100%" icon="@Embed('image/user.png')" />
 	<s:ViewNavigator textAlign="center" id="viewEsami" label="Gestione Esami" width="100%" height="100%" firstView="views.Lista" icon="@Embed('image/book.png')" />
 	<s:ViewNavigator textAlign="center" id="viewAgenda" label="Agenda Esami" width="100%" height="100%" firstView="views.Agenda" icon="@Embed('image/calendar.png')" />
 	<s:ViewNavigator textAlign="center" id="viewStat" label="Andamento" width="100%" height="100%" firstView="views.Stat" icon="@Embed('image/line.png')" />
