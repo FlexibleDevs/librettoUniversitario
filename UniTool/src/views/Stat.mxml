@@ -44,7 +44,7 @@
 			
 			private function lch01_dataTipFunction(hd:HitData):String {
 				var strLabel:String;	
-				strLabel='Esame sostenuto il giorno <b>' + hd.item.data + '</b><br>con il voto di <b>' + hd.item.val_desc + "</b>";//AreaSeriesItem(hd.chartItem).yValue.toString();
+				strLabel='<center><b>' + hd.item.data + '</b><br>Voto: <b>' + hd.item.val_desc + "</b></center>";//AreaSeriesItem(hd.chartItem).yValue.toString();
 				return strLabel;
 			}
 			
@@ -76,7 +76,7 @@
 		
 		<s:RadioButtonGroup id="radioIncludiMedia"/>
 	</fx:Declarations>
-	<mx:AreaChart id="lch01" top="50" bottom="50" left="0" right="0" showDataTips="true" dataProvider="{arcAndamento}" dataTipFunction="lch01_dataTipFunction" showAllDataTips="{blnDataTips}">
+	<mx:AreaChart id="lch01" top="50" bottom="50" left="0" right="0" showDataTips="true" dataProvider="{arcAndamento}" dataTipFunction="lch01_dataTipFunction" showAllDataTips="{blnDataTips}" >
 		<mx:horizontalAxis>
 			<mx:CategoryAxis title="Andamento Cronologico" dataProvider="{arcAndamento}" categoryField="data" />
 		</mx:horizontalAxis>

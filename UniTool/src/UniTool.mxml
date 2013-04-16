@@ -5,7 +5,14 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
+			
+			import spark.components.TabbedViewNavigator;
+			import spark.components.View;
+			
+			import views.Profilo;
+			import views.ProfiloConfigurato;
 			
 			[Bindable]
 			private var _esami:Esami = new Esami();
@@ -18,17 +25,23 @@
 			private var strLast:String='';
 			[Bindable]
 			private var strNext:String='';
+			[Bindable]
+			private var blnUserConf:Boolean=false;
 			
 			[Bindable]
 			private var _user:User = new User();
 			
 			protected function tabbedviewnavigatorapplication1_creationCompleteHandler(event:FlexEvent):void
 			{
-				//controllo se utente configurato o meno
-				if(_user.status()){
-					
+				blnUserConf=_user.status();
+				//controllo se utente configurato o meno (primo accesso)
+				if(blnUserConf){
+					this.removeElement(viewProfilo);
+					viewEsami.enabled=true;
+					viewAgenda.enabled=true;
+					viewStat.enabled=true;
+
 					//DA VERIFICARE INSIEME SE POSSONO ESSERE UTILI O MENO
-					
 					//Riepilogo ultimo esame
 					arcLast=new ArrayCollection(_esami.getLastExam());
 					if(arcLast.length > 0){
@@ -42,7 +55,10 @@
 						//callNext.open(this);
 					}
 				}else{
-					
+					this.removeElement(viewProfiloConf);
+					viewEsami.enabled=false;
+					viewAgenda.enabled=false;
+					viewStat.enabled=false;
 				}
 			}
 			
@@ -108,8 +124,9 @@
 			</s:VGroup>
 		</s:Callout>
 	</fx:Declarations>
-	
-	<s:ViewNavigator textAlign="center" id="viewProfilo" label="Profilo" width="100%" height="100%" firstView="views.Profilo" icon="@Embed('image/user.png')" />
+	 
+	<s:ViewNavigator textAlign="center" id="viewProfilo" label="Profilo" width="100%" firstView="views.Profilo" height="100%" icon="@Embed('image/user.png')" />
+	<s:ViewNavigator textAlign="center" id="viewProfiloConf" label="Profilo" width="100%" firstView="views.ProfiloConfigurato" height="100%" icon="@Embed('image/user.png')" />
 	<s:ViewNavigator textAlign="center" id="viewEsami" label="Gestione Esami" width="100%" height="100%" firstView="views.Lista" icon="@Embed('image/book.png')" />
 	<s:ViewNavigator textAlign="center" id="viewAgenda" label="Agenda Esami" width="100%" height="100%" firstView="views.Agenda" icon="@Embed('image/calendar.png')" />
 	<s:ViewNavigator textAlign="center" id="viewStat" label="Andamento" width="100%" height="100%" firstView="views.Stat" icon="@Embed('image/line.png')" />

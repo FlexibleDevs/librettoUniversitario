@@ -31,7 +31,6 @@
 			
 			protected function User_creationCompleteHandler(event:FlexEvent):void
 			{
-				ControlloUtente();
 				PopoloInfo();
 				txtusr_nome.setFocus();
 			}
@@ -65,14 +64,6 @@
 				var mpLoaderInfo:LoaderInfo = e.target as LoaderInfo;
 				mpLoaderInfo.removeEventListener(Event.COMPLETE, onMediaLoaded);
 				imgProfilo.source = mpLoaderInfo.loader;
-			}
-			
-			private function ControlloUtente():void {
-				if(_user.status() == true){
-					
-				} else {
-					
-				}
 			}
 			
 			protected function UpdateUser():void
@@ -133,7 +124,7 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:VGroup left.Profilo="0" top.Profilo="0" bottom.Profilo="1" width.Profilo="598">
+	<s:VGroup left.Profilo="0" right.Profilo="202" top.Profilo="0" bottom.Profilo="1">
 		
 	
 	<s:TextInput id="txtusr_nome" y="64" width="100%" height="50" fontSize="20" maxChars="100"
@@ -162,9 +153,9 @@
 	</s:VGroup>
 	<s:Image id="imgProfilo" y="10" height="159" scaleMode="letterbox" smooth="true"
 			 x.ConfProfilo="488" width.ConfProfilo="184"
-			 y.Profilo="0" left.Profilo="606" right.Profilo="0"
+			 y.Profilo="0" right.Profilo="0" width.Profilo="194"
 			 ioError.Profilo="imgProfilo_ioError(event)"/>
-	<s:Button y="177" width="184" label="Scatta" click="CatturaFoto(event)"
-			  x.ConfProfilo="488"
-			  y.Profilo="167" left.Profilo="606" width.Profilo="194"/>
+	<s:Button y="177" label="Scatta" click="CatturaFoto(event)"
+			  x.ConfProfilo="488" width.ConfProfilo="184"
+			  y.Profilo="167" right.Profilo="0" width.Profilo="194"/>
 </s:View>

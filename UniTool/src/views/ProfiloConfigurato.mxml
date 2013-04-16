@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="ProfiloConfigurato" viewActivate="profilo_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			[Bindable]
+			private var _user:User = new User();
+			
+			protected function profilo_creationCompleteHandler(event:Event):void
+			{
+				lblUtente.text = _user.getinfo()[0].usr_nome + " " + _user.getinfo()[0].usr_cogn;
+			}
+			
+			private function imgProfilo_ioError(e:IOErrorEvent):void {
+				imgProfilo.source = null;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Image id="imgProfilo" left="0" top="0" width="50%" height="190"
+			 ioError="imgProfilo_ioError(event)" scaleMode="letterbox" smooth="true"/>
+	<s:Label id="lblUtente" x="0" y="198" width="240" height="20" fontStyle="italic"
+			 verticalAlign="middle"/>
+</s:View>

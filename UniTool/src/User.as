@@ -8,7 +8,6 @@ package
 		import flash.filesystem.FileMode;
 		
 		import mx.collections.ArrayCollection;
-		//import mx.controls.Alert;
 		import mx.events.FlexEvent;
 		
 		private var stmt:SQLStatement;
